@@ -1,4 +1,5 @@
-import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field.dart';
+import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
+import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field_stful.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -28,8 +29,8 @@ class LoginElements extends StatefulWidget {
 
 class LoginElementsState extends State<LoginElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<CustomTextFieldState> emailKey = GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldStfulState> emailKey = GlobalKey<CustomTextFieldStfulState>();
+  final GlobalKey<CustomTextFieldStfulState> passwordKey = GlobalKey<CustomTextFieldStfulState>();
   String? errorMessage;
 
   @override
@@ -47,18 +48,19 @@ class LoginElementsState extends State<LoginElements> {
                 child: Icon(Icons.person),
               ),
               const SizedBox(height: 50),
-              CustomTextField(
+              CustomTextFieldStful(
                 key: emailKey,
                 hintTextContent: 'Email',
                 regularExpression: r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
               ),
               const SizedBox(height: 30),
-              CustomTextField(
+              CustomTextFieldStful(
                 key: passwordKey,
                 hintTextContent: 'Contraseña',
                 isPassword: true,
+                isRequired: true,
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 30),
               if (errorMessage != null)
                 ErrorBullet(message: errorMessage!),
               LoginButton(
@@ -71,6 +73,8 @@ class LoginElementsState extends State<LoginElements> {
                   });
                 },
               ),
+              const SizedBox(height: 20),
+              const CustomButton(routeName: '', buttonText: 'Registrarse',)
             ],
           ),
         ),
@@ -81,8 +85,8 @@ class LoginElementsState extends State<LoginElements> {
 
 class LoginButton extends StatelessWidget {
   final GlobalKey<FormState> formKey;
-  final GlobalKey<CustomTextFieldState> emailKey;
-  final GlobalKey<CustomTextFieldState> passwordKey;
+  final GlobalKey<CustomTextFieldStfulState> emailKey;
+  final GlobalKey<CustomTextFieldStfulState> passwordKey;
   final Function(String) onError;
 
   const LoginButton({
@@ -102,15 +106,19 @@ class LoginButton extends StatelessWidget {
             final email = emailKey.currentState?.textValue ?? '';
             final password = passwordKey.currentState?.textValue ?? '';
             final isValidEmail = emailKey.currentState?.isValid ?? false;
+            final isValidPassword = passwordKey.currentState?.isValid ?? false;
 
-            if (isValidEmail) {
+            if (isValidEmail && isValidPassword) {
               print('Email: $email');
               print('Contraseña: $password');
             } else {
-              onError('Email no válido');
+              if (!isValidEmail) {
+                onError('Email no válido');
+              }
+              if (!isValidPassword) {
+                onError('Contraseña no válida');
+              }
             }
-          } else {
-            onError('Formulario no válido');
           }
         },
         child: const Text('Iniciar Sesión'),
