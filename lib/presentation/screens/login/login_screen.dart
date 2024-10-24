@@ -35,12 +35,13 @@ class LoginElementsState extends State<LoginElements> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 45),
         child: Form(
           key: formKey,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 50),
               const CircleAvatar(
@@ -73,7 +74,7 @@ class LoginElementsState extends State<LoginElements> {
                   });
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               const CustomButton(routeName: '', buttonText: 'Registrarse',)
             ],
           ),
