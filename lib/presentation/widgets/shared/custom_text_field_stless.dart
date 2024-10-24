@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+
 class CustomTextField extends StatelessWidget {
   final TextEditingController textController = TextEditingController();
   final String hintTextContent;
   final bool isPassword;
   CustomTextField(
-      {super.key, this.hintTextContent = '', this.isPassword = false});
+      {super.key,
+      this.hintTextContent = '',
+      this.isPassword = false,
+      required TextEditingController textController});
   @override
   Widget build(BuildContext context) {
     final FocusNode focusNode = FocusNode();
@@ -17,7 +21,7 @@ class CustomTextField extends StatelessWidget {
       focusedBorder: outlineInputBorder,
       filled: true,
     );
-    
+
     return TextFormField(
       onTapOutside: (event) {
         focusNode.unfocus();
@@ -28,5 +32,6 @@ class CustomTextField extends StatelessWidget {
       obscureText: isPassword,
     );
   }
+
   String get textValue => textController.value.text;
 }

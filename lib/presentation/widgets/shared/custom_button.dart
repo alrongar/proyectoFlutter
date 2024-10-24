@@ -4,7 +4,11 @@ class CustomButton extends StatelessWidget {
   final String routeName;
   final String buttonText;
 
-  const CustomButton({required this.routeName, super.key, required this.buttonText});
+  const CustomButton(
+      {required this.routeName,
+      super.key,
+      required this.buttonText,
+      required Null Function() onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +25,8 @@ class CustomButton extends StatelessWidget {
   }
 
   bool _routeExists(BuildContext context, String routeName) {
-    final routes = Navigator.of(context).widget.pages.map((page) => page.name).toList();
+    final routes =
+        Navigator.of(context).widget.pages.map((page) => page.name).toList();
     return routes.contains(routeName);
   }
 }

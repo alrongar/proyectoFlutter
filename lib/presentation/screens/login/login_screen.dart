@@ -29,8 +29,10 @@ class LoginElements extends StatefulWidget {
 
 class LoginElementsState extends State<LoginElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<CustomTextFieldStfulState> emailKey = GlobalKey<CustomTextFieldStfulState>();
-  final GlobalKey<CustomTextFieldStfulState> passwordKey = GlobalKey<CustomTextFieldStfulState>();
+  final GlobalKey<CustomTextFieldStfulState> emailKey =
+      GlobalKey<CustomTextFieldStfulState>();
+  final GlobalKey<CustomTextFieldStfulState> passwordKey =
+      GlobalKey<CustomTextFieldStfulState>();
   String? errorMessage;
 
   @override
@@ -52,7 +54,8 @@ class LoginElementsState extends State<LoginElements> {
               CustomTextFieldStful(
                 key: emailKey,
                 hintTextContent: 'Email',
-                regularExpression: r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                regularExpression:
+                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
               ),
               const SizedBox(height: 30),
               CustomTextFieldStful(
@@ -62,8 +65,7 @@ class LoginElementsState extends State<LoginElements> {
                 isRequired: true,
               ),
               const SizedBox(height: 30),
-              if (errorMessage != null)
-                ErrorBullet(message: errorMessage!),
+              if (errorMessage != null) ErrorBullet(message: errorMessage!),
               LoginButton(
                 formKey: formKey,
                 emailKey: emailKey,
@@ -75,7 +77,10 @@ class LoginElementsState extends State<LoginElements> {
                 },
               ),
               const SizedBox(height: 15),
-              const CustomButton(routeName: '', buttonText: 'Registrarse',)
+              const CustomButton(
+                routeName: '',
+                buttonText: 'Registrarse',
+              )
             ],
           ),
         ),
@@ -141,7 +146,8 @@ class ErrorBullet extends StatelessWidget {
         children: [
           const Icon(Icons.error, color: Colors.red),
           const SizedBox(width: 10),
-          Expanded(child: Text(message, style: const TextStyle(color: Colors.red))),
+          Expanded(
+              child: Text(message, style: const TextStyle(color: Colors.red))),
         ],
       ),
     );
