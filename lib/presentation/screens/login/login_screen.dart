@@ -1,5 +1,4 @@
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
-import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field_stful.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -29,10 +28,8 @@ class LoginElements extends StatefulWidget {
 
 class LoginElementsState extends State<LoginElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<CustomTextFieldStfulState> emailKey =
-      GlobalKey<CustomTextFieldStfulState>();
-  final GlobalKey<CustomTextFieldStfulState> passwordKey =
-      GlobalKey<CustomTextFieldStfulState>();
+  final GlobalKey<CustomTextFieldState> emailKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
   String? errorMessage;
 
   @override
@@ -51,21 +48,21 @@ class LoginElementsState extends State<LoginElements> {
                 child: Icon(Icons.person),
               ),
               const SizedBox(height: 50),
-              CustomTextFieldStful(
+              CustomTextField(
                 key: emailKey,
                 hintTextContent: 'Email',
-                regularExpression:
-                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                regularExpression: r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
               ),
               const SizedBox(height: 30),
-              CustomTextFieldStful(
+              CustomTextField(
                 key: passwordKey,
                 hintTextContent: 'Contraseña',
                 isPassword: true,
                 isRequired: true,
               ),
               const SizedBox(height: 30),
-              if (errorMessage != null) ErrorBullet(message: errorMessage!),
+              if (errorMessage != null)
+                ErrorBullet(message: errorMessage!),
               LoginButton(
                 formKey: formKey,
                 emailKey: emailKey,
@@ -76,10 +73,13 @@ class LoginElementsState extends State<LoginElements> {
                   });
                 },
               ),
-              const SizedBox(height: 15),
-              const CustomButton(
+              const SizedBox(height: 20),
+              CustomButton(
                 routeName: '',
                 buttonText: 'Registrarse',
+                onPressed: () {
+                  // Add your onPressed logic here
+                },
               )
             ],
           ),
@@ -91,8 +91,8 @@ class LoginElementsState extends State<LoginElements> {
 
 class LoginButton extends StatelessWidget {
   final GlobalKey<FormState> formKey;
-  final GlobalKey<CustomTextFieldStfulState> emailKey;
-  final GlobalKey<CustomTextFieldStfulState> passwordKey;
+  final GlobalKey<CustomTextFieldState> emailKey;
+  final GlobalKey<CustomTextFieldState> passwordKey;
   final Function(String) onError;
 
   const LoginButton({
@@ -146,10 +146,92 @@ class ErrorBullet extends StatelessWidget {
         children: [
           const Icon(Icons.error, color: Colors.red),
           const SizedBox(width: 10),
-          Expanded(
-              child: Text(message, style: const TextStyle(color: Colors.red))),
+          Expanded(child: Text(message, style: const TextStyle(color: Colors.red))),
         ],
       ),
     );
   }
+}
+
+class CustomTextField extends StatefulWidget {
+  final String hintTextContent;
+  final bool isPassword;
+  final String? regularExpression;
+  final bool isRequired;
+
+  const CustomTextField({
+    super.key,
+    this.hintTextContent = '',
+    this.isPassword = false,
+    this.regularExpression,
+    this.isRequired = false,
+  });
+
+  @override
+  CustomTextFieldState createState() => CustomTextFieldState();
+}
+
+class CustomTextFieldState extends State<CustomTextField> {
+  final TextEditingController textController = TextEditingController();
+  final FocusNode focusNode = FocusNode();
+  bool _isValid = false;
+
+  @override
+  void dispose() {
+    textController.dispose();
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final UnderlineInputBorder outlineInputBorder = UnderlineInputBorder(
+      borderSide: const BorderSide(color: Colors.transparent),
+      borderRadius: BorderRadius.circular(40),
+    );
+
+    final inputDecoration = InputDecoration(
+      hintText: widget.hintTextContent,
+      enabledBorder: outlineInputBorder,
+      focusedBorder: outlineInputBorder,
+      errorBorder: outlineInputBorder.copyWith(
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      focusedErrorBorder: outlineInputBorder.copyWith(
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      filled: true,
+    );
+
+    return TextFormField(
+      focusNode: focusNode,
+      controller: textController,
+      decoration: inputDecoration,
+      obscureText: widget.isPassword,
+      validator: (value) {
+        final validationResult = validateExpression(textFieldValue: value ?? '');
+        setState(() {
+          _isValid = validationResult == null;
+        });
+        return validationResult;
+      },
+    );
+  }
+
+  String? validateExpression({required String textFieldValue}) {
+    if (widget.isRequired && textFieldValue.isEmpty) {
+      return 'Este campo no puede estar vacío';
+    }
+    if (widget.regularExpression != null && widget.regularExpression!.isNotEmpty) {
+      final regex = RegExp(widget.regularExpression!);
+      if (!regex.hasMatch(textFieldValue)) {
+        return 'Entrada inválida';
+      }
+    }
+    return null;
+  }
+
+  String get textValue => textController.value.text;
+
+  bool get isValid => _isValid;
 }

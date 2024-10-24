@@ -1,7 +1,6 @@
-import 'package:eventify_flutter/presentation/screens/login/login_screen.dart';
+import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
-import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field_stful.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -28,12 +27,9 @@ class RegisterElements extends StatefulWidget {
 
 class RegisterElementsState extends State<RegisterElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<CustomTextFieldStfulState> emailKey =
-      GlobalKey<CustomTextFieldStfulState>();
-  final GlobalKey<CustomTextFieldStfulState> passwordKey =
-      GlobalKey<CustomTextFieldStfulState>();
-  final GlobalKey<CustomTextFieldStfulState> nameKey =
-      GlobalKey<CustomTextFieldStfulState>();
+  final GlobalKey<CustomTextFieldState> emailKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> nameKey = GlobalKey<CustomTextFieldState>();
   String? errorMessage;
 
   @override
@@ -52,20 +48,19 @@ class RegisterElementsState extends State<RegisterElements> {
                 child: Icon(Icons.person_add),
               ),
               const SizedBox(height: 50),
-              CustomTextFieldStful(
+              CustomTextField(
                 key: nameKey,
                 hintTextContent: 'Nombre',
                 isRequired: true,
               ),
               const SizedBox(height: 30),
-              CustomTextFieldStful(
+              CustomTextField(
                 key: emailKey,
                 hintTextContent: 'Email',
-                regularExpression:
-                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                regularExpression: r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
               ),
               const SizedBox(height: 30),
-              CustomTextFieldStful(
+              CustomTextField(
                 key: passwordKey,
                 hintTextContent: 'Contraseña',
                 isPassword: true,
@@ -74,8 +69,7 @@ class RegisterElementsState extends State<RegisterElements> {
               const SizedBox(height: 30),
               if (errorMessage != null) ErrorBullet(message: errorMessage!),
               CustomButton(
-                routeName:
-                    '', // Aquí puedes definir la ruta a la que redirigir después del registro
+                routeName: '', // Aquí puedes definir la ruta a la que redirigir después del registro
                 buttonText: 'Registrarse',
                 onPressed: () {
                   // Aquí puedes manejar la lógica de registro, como validar el formulario y enviar los datos.
@@ -87,14 +81,33 @@ class RegisterElementsState extends State<RegisterElements> {
               const SizedBox(height: 15),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(
-                      context, '/login'); // Navegar a la pantalla de login
+                  Navigator.pushNamed(context, '/login'); // Navegar a la pantalla de login
                 },
                 child: const Text('¿Ya tienes una cuenta? Inicia sesión aquí'),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ErrorBullet extends StatelessWidget {
+  final String message;
+
+  const ErrorBullet({required this.message, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          const Icon(Icons.error, color: Colors.red),
+          const SizedBox(width: 10),
+          Expanded(child: Text(message, style: const TextStyle(color: Colors.red))),
+        ],
       ),
     );
   }
