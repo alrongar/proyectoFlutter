@@ -1,4 +1,5 @@
 import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field.dart';
+import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
 import 'package:flutter/material.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
 
@@ -9,12 +10,13 @@ class RegisterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: colors.primary,
-        title: const Text('Registro', style: TextStyle(fontSize: 30)),
-      ),
-      body: const RegisterElements(),
-    );
+        appBar: AppBar(
+          backgroundColor: colors.primary,
+          title: const Text('Registro', style: TextStyle(fontSize: 30)),
+        ),
+        body: const GradientBackground(
+          child: RegisterElements(),
+        ));
   }
 }
 

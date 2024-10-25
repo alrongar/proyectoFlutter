@@ -1,4 +1,5 @@
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
+import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -12,7 +13,9 @@ class LoginScreen extends StatelessWidget {
         backgroundColor: colors.primary,
         title: const Text('Login', style: TextStyle(fontSize: 30)),
       ),
-      body: const LoginElements(),
+      body: const GradientBackground(
+        child: LoginElements(),
+      ),
     );
   }
 }
