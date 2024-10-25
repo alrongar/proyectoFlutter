@@ -1,5 +1,5 @@
 import 'package:eventify_flutter/config/theme/app_theme.dart';
-import 'package:eventify_flutter/presentation/screens/register_screen.dart';
+import 'package:eventify_flutter/presentation/screens/login/register_screen.dart';
 import 'package:eventify_flutter/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,15 +22,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Eventify',
-      theme: AppTheme(selectedColor: 1).theme(),
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) =>
-            const RegisterScreen(), // Asegúrate de crear este archivo
-      },
-    );
+        debugShowCheckedModeBanner: false,
+        title: 'Eventify',
+        theme: AppTheme(selectedColor: 1).theme(),
+        initialRoute: '/login',
+        routes: {
+          '/login': (context) => const LoginScreen(),
+          '/register': (context) =>
+              const RegisterScreen(), // Asegúrate de que esta clase exista
+        });
   }
 }

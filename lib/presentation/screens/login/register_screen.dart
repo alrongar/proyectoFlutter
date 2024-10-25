@@ -27,9 +27,12 @@ class RegisterElements extends StatefulWidget {
 
 class RegisterElementsState extends State<RegisterElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<CustomTextFieldState> emailKey = GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> nameKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> emailKey =
+      GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> passwordKey =
+      GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> nameKey =
+      GlobalKey<CustomTextFieldState>();
   String? errorMessage;
 
   @override
@@ -57,7 +60,8 @@ class RegisterElementsState extends State<RegisterElements> {
               CustomTextField(
                 key: emailKey,
                 hintTextContent: 'Email',
-                regularExpression: r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                regularExpression:
+                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
               ),
               const SizedBox(height: 30),
               CustomTextField(
@@ -68,20 +72,16 @@ class RegisterElementsState extends State<RegisterElements> {
               ),
               const SizedBox(height: 30),
               if (errorMessage != null) ErrorBullet(message: errorMessage!),
-              CustomButton(
-                routeName: '', // Aquí puedes definir la ruta a la que redirigir después del registro
+              const CustomButton(
+                routeName:
+                    '/login', // Aquí puedes definir la ruta a la que redirigir después del registro
                 buttonText: 'Registrarse',
-                onPressed: () {
-                  // Aquí puedes manejar la lógica de registro, como validar el formulario y enviar los datos.
-                  if (formKey.currentState!.validate()) {
-                    // Si la validación es exitosa, puedes continuar con el registro
-                  }
-                },
               ),
               const SizedBox(height: 15),
               GestureDetector(
                 onTap: () {
-                  Navigator.pushNamed(context, '/login'); // Navegar a la pantalla de login
+                  Navigator.pushNamed(
+                      context, '/login'); // Navegar a la pantalla de login
                 },
                 child: const Text('¿Ya tienes una cuenta? Inicia sesión aquí'),
               ),
@@ -106,7 +106,8 @@ class ErrorBullet extends StatelessWidget {
         children: [
           const Icon(Icons.error, color: Colors.red),
           const SizedBox(width: 10),
-          Expanded(child: Text(message, style: const TextStyle(color: Colors.red))),
+          Expanded(
+              child: Text(message, style: const TextStyle(color: Colors.red))),
         ],
       ),
     );

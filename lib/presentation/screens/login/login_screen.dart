@@ -28,8 +28,10 @@ class LoginElements extends StatefulWidget {
 
 class LoginElementsState extends State<LoginElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<CustomTextFieldState> emailKey = GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> emailKey =
+      GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> passwordKey =
+      GlobalKey<CustomTextFieldState>();
   String? errorMessage;
 
   @override
@@ -51,7 +53,8 @@ class LoginElementsState extends State<LoginElements> {
               CustomTextField(
                 key: emailKey,
                 hintTextContent: 'Email',
-                regularExpression: r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                regularExpression:
+                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
               ),
               const SizedBox(height: 30),
               CustomTextField(
@@ -61,8 +64,7 @@ class LoginElementsState extends State<LoginElements> {
                 isRequired: true,
               ),
               const SizedBox(height: 30),
-              if (errorMessage != null)
-                ErrorBullet(message: errorMessage!),
+              if (errorMessage != null) ErrorBullet(message: errorMessage!),
               LoginButton(
                 formKey: formKey,
                 emailKey: emailKey,
@@ -74,12 +76,9 @@ class LoginElementsState extends State<LoginElements> {
                 },
               ),
               const SizedBox(height: 20),
-              CustomButton(
-                routeName: '',
+              const CustomButton(
                 buttonText: 'Registrarse',
-                onPressed: () {
-                  // Add your onPressed logic here
-                },
+                routeName: '/register',
               )
             ],
           ),
@@ -146,7 +145,8 @@ class ErrorBullet extends StatelessWidget {
         children: [
           const Icon(Icons.error, color: Colors.red),
           const SizedBox(width: 10),
-          Expanded(child: Text(message, style: const TextStyle(color: Colors.red))),
+          Expanded(
+              child: Text(message, style: const TextStyle(color: Colors.red))),
         ],
       ),
     );
@@ -209,7 +209,8 @@ class CustomTextFieldState extends State<CustomTextField> {
       decoration: inputDecoration,
       obscureText: widget.isPassword,
       validator: (value) {
-        final validationResult = validateExpression(textFieldValue: value ?? '');
+        final validationResult =
+            validateExpression(textFieldValue: value ?? '');
         setState(() {
           _isValid = validationResult == null;
         });
@@ -222,7 +223,8 @@ class CustomTextFieldState extends State<CustomTextField> {
     if (widget.isRequired && textFieldValue.isEmpty) {
       return 'Este campo no puede estar vacío';
     }
-    if (widget.regularExpression != null && widget.regularExpression!.isNotEmpty) {
+    if (widget.regularExpression != null &&
+        widget.regularExpression!.isNotEmpty) {
       final regex = RegExp(widget.regularExpression!);
       if (!regex.hasMatch(textFieldValue)) {
         return 'Entrada inválida';
