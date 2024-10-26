@@ -7,13 +7,14 @@ class CustomTextField extends StatefulWidget {
   final bool isRequired;
   final String? regExpErrorMessage;
 
-  const CustomTextField(
-      {super.key,
-      this.hintTextContent = '',
-      this.isPassword = false,
-      this.regularExpression,
-      this.isRequired = false,
-      this.regExpErrorMessage});
+  const CustomTextField({
+    super.key,
+    this.hintTextContent = '',
+    this.isPassword = false,
+    this.regularExpression,
+    this.isRequired = false,
+    this.regExpErrorMessage,
+  });
 
   @override
   CustomTextFieldState createState() => CustomTextFieldState();
@@ -26,30 +27,28 @@ class CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     final FocusNode focusNode = FocusNode();
-    final UnderlineInputBorder outlineInputBorder = UnderlineInputBorder(
-      borderSide: const BorderSide(color: Colors.transparent),
-      borderRadius: BorderRadius.circular(40),
-    );
 
     final inputDecoration = InputDecoration(
       hintText: widget.hintTextContent,
-      enabledBorder: outlineInputBorder,
-      focusedBorder: outlineInputBorder,
-      errorBorder: outlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Colors.red),
+      contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey.shade300),
       ),
-      focusedErrorBorder: outlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Colors.red),
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
       ),
-      filled: true,
+      errorBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(color: Colors.red),
+      ),
+      focusedErrorBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(color: Colors.red),
+      ),
+      hintStyle: TextStyle(color: Colors.grey.shade500),
     );
 
     return TextFormField(
-      onTapOutside: (event) {
-        focusNode.unfocus();
-      },
-      focusNode: focusNode,
       controller: textController,
+      focusNode: focusNode,
       decoration: inputDecoration,
       obscureText: widget.isPassword,
       validator: (value) {
@@ -60,6 +59,8 @@ class CustomTextFieldState extends State<CustomTextField> {
         });
         return validationResult;
       },
+      style: const TextStyle(color: Colors.black),
+      maxLines: 1,
     );
   }
 
@@ -80,72 +81,4 @@ class CustomTextFieldState extends State<CustomTextField> {
   String get textValue => textController.value.text;
 
   bool get isValid => _isValid;
-}
-
-class CustomTextFieldStless extends StatelessWidget {
-  final String hintTextContent;
-  final bool isPassword;
-  final String? regularExpression;
-  final bool isRequired;
-  final String? regExpErrorMessage;
-  final TextEditingController controller;
-
-  const CustomTextFieldStless({
-    super.key,
-    required this.controller,
-    this.hintTextContent = '',
-    this.isPassword = false,
-    this.regularExpression,
-    this.isRequired = false,
-    this.regExpErrorMessage,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final FocusNode focusNode = FocusNode();
-    final UnderlineInputBorder outlineInputBorder = UnderlineInputBorder(
-      borderSide: const BorderSide(color: Colors.transparent),
-      borderRadius: BorderRadius.circular(40),
-    );
-
-    final inputDecoration = InputDecoration(
-      hintText: hintTextContent,
-      enabledBorder: outlineInputBorder,
-      focusedBorder: outlineInputBorder,
-      errorBorder: outlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Colors.red),
-      ),
-      focusedErrorBorder: outlineInputBorder.copyWith(
-        borderSide: const BorderSide(color: Colors.red),
-      ),
-      filled: true,
-    );
-
-    return TextFormField(
-      onTapOutside: (event) {
-        focusNode.unfocus();
-      },
-      focusNode: focusNode,
-      controller: controller,
-      decoration: inputDecoration,
-      obscureText: isPassword,
-      validator: (value) {
-        final validationResult = validateExpression(textFieldValue: value ?? '');
-        return validationResult;
-      },
-    );
-  }
-
-  String? validateExpression({required String textFieldValue}) {
-    if (isRequired && textFieldValue.isEmpty) {
-      return 'Este campo no puede estar vacío';
-    }
-    if (regularExpression != null && regularExpression!.isNotEmpty) {
-      final regex = RegExp(regularExpression!);
-      if (!regex.hasMatch(textFieldValue)) {
-        return regExpErrorMessage ?? 'Entrada inválida';
-      }
-    }
-    return null;
-  }
 }

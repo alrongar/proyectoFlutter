@@ -8,15 +8,31 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: colors.primary,
-          title: const Text('Registro', style: TextStyle(fontSize: 30)),
+    return const Scaffold(
+      body: GradientBackground(
+        title: '',
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 32.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: Image(
+                  image: AssetImage('assets/Eventify_logo.png'),
+                  width:
+                      230, // Ajuste de tamaño más pequeño para ocupar menos espacio
+                  height: 230,
+                  fit: BoxFit
+                      .contain, // Ajusta el tamaño sin agregar espacio extra
+                ),
+              ),
+              RegisterElements(), // Espacio flexible inferior
+            ],
+          ),
         ),
-        body: const GradientBackground(
-          child: RegisterElements(),
-        ));
+      ),
+    );
   }
 }
 
@@ -39,77 +55,42 @@ class RegisterElementsState extends State<RegisterElements> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 45),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 50),
-              const CircleAvatar(
-                radius: 120,
-                child: Icon(Icons.person_add),
-              ),
-              const SizedBox(height: 50),
-              CustomTextField(
-                key: nameKey,
-                hintTextContent: 'Nombre',
-                isRequired: true,
-              ),
-              const SizedBox(height: 30),
-              CustomTextField(
-                key: emailKey,
-                hintTextContent: 'Email',
-                regularExpression:
-                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-              ),
-              const SizedBox(height: 30),
-              CustomTextField(
-                key: passwordKey,
-                hintTextContent: 'Contraseña',
-                isPassword: true,
-                isRequired: true,
-              ),
-              const SizedBox(height: 30),
-              if (errorMessage != null) ErrorBullet(message: errorMessage!),
-              const CustomButton(
-                routeName:
-                    '/login', // Aquí puedes definir la ruta a la que redirigir después del registro
-                buttonText: 'Registrarse',
-              ),
-              const SizedBox(height: 15),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(
-                      context, '/login'); // Navegar a la pantalla de login
-                },
-                child: const Text('¿Ya tienes una cuenta? Inicia sesión aquí'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ErrorBullet extends StatelessWidget {
-  final String message;
-
-  const ErrorBullet({required this.message, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
+    return Form(
+      key: formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.error, color: Colors.red),
-          const SizedBox(width: 10),
-          Expanded(
-              child: Text(message, style: const TextStyle(color: Colors.red))),
+          CustomTextField(
+            key: nameKey,
+            hintTextContent: 'Nombre',
+            isRequired: true,
+          ),
+          const SizedBox(height: 20),
+          CustomTextField(
+            key: emailKey,
+            hintTextContent: 'Email',
+            regularExpression:
+                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+          ),
+          const SizedBox(height: 20),
+          CustomTextField(
+            key: passwordKey,
+            hintTextContent: 'Contraseña',
+            isPassword: true,
+            isRequired: true,
+          ),
+          const SizedBox(height: 40),
+          const CustomButton(
+            routeName: '/login',
+            buttonText: 'Registrarse',
+          ),
+          const SizedBox(height: 20),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, '/login');
+            },
+            child: const Text('¿Ya tienes una cuenta? Inicia sesión aquí'),
+          ),
         ],
       ),
     );
