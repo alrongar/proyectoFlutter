@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('https://tu-api.com/users/login'),//cambiar a url de api
+        Uri.parse('https://eventify.allsites.es/public/api/'),//cambiar a url de api
         headers: {
           'Content-Type': 'application/json',
         },

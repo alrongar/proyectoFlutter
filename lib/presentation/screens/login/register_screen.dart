@@ -61,10 +61,10 @@ class RegisterElementsState extends State<RegisterElements> {
       final name = nameKey.currentState?.textValue;
       final email = emailKey.currentState?.textValue;
       final password = passwordKey.currentState?.textValue;
-      final rol = selectedUserType;
+      final role = selectedUserType;
       if (name != null && email != null && password != null) {
         const String url =
-            'https://api.tuapi.com/register'; //cambiar por url de la api
+            'https://eventify.allsites.es/public/api/'; //cambiar por url de la api
 
         try {
           final response = await http.post(
@@ -76,7 +76,7 @@ class RegisterElementsState extends State<RegisterElements> {
               'name': name,
               'email': email,
               'password': password,
-              'userType': rol, 
+              'userType': role, 
             }),
           );
 
