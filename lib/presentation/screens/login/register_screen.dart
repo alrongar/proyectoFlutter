@@ -83,6 +83,7 @@ class RegisterElementsState extends State<RegisterElements> {
           const CustomButton(
             routeName: '/login',
             buttonText: 'Registrarse',
+            
           ),
           const SizedBox(height: 20),
           GestureDetector(
