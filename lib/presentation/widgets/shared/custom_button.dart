@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class CustomButton extends StatelessWidget {
   final String buttonText; // Texto que mostrará el botón
   final String routeName; // Ruta a la que navegará al presionar el botón
-
+  final VoidCallback? onPressed;
+  
   const CustomButton({
     required this.buttonText,
     required this.routeName,
-    super.key,
+    super.key, 
+    this.onPressed,
   });
 
   @override

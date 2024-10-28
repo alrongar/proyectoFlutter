@@ -121,10 +121,10 @@ class RegisterElementsState extends State<RegisterElements> {
             isRequired: true,
           ),
           const SizedBox(height: 40),
-          const CustomButton(
+          CustomButton(
             routeName: '/login',
             buttonText: 'Registrarse',
-
+            onPressed: _registerUser,
           ),
           const SizedBox(height: 20),
           GestureDetector(
