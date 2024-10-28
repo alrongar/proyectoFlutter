@@ -54,8 +54,15 @@ class LoginScreen extends StatelessWidget {
                 onTap: () {
                   Navigator.pushNamed(context, '/register');
                 },
-                child: const Text('¿No tienes una cuenta? Regístrate aquí'),
-              ),
+                child: const Text(
+                  '¿No tienes una cuenta? Registrate sesión aquí',
+                  style: TextStyle(
+                    fontSize: 13.0,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
             ],
           ),
         ),

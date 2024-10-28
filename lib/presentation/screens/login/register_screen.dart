@@ -90,8 +90,15 @@ class RegisterElementsState extends State<RegisterElements> {
             onTap: () {
               Navigator.pushNamed(context, '/login');
             },
-            child: const Text('¿Ya tienes una cuenta? Inicia sesión aquí'),
-          ),
+            child: const Text(
+              '¿Ya tienes una cuenta? Inicia sesión aquí',
+              style: TextStyle(
+                fontSize: 13.0,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          )
         ],
       ),
     );
