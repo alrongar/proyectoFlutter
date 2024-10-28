@@ -2,9 +2,58 @@ import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field.d
 import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
 import 'package:flutter/material.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> login() async {
+    
+
+    final String email = _emailController.text;
+    final String password = _passwordController.text;
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://tu-api.com/users/login'),//cambiar a url de api
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Manejar respuesta exitosa
+        final data = jsonDecode(response.body);
+        print('Login exitoso: $data');
+        // Aquí puedes navegar a otra pantalla o almacenar la sesión
+      } else {
+        // Manejar error
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Credenciales incorrectas')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error en el inicio de sesión')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +92,10 @@ class LoginScreen extends StatelessWidget {
                 isRequired: true,
               ),
               const SizedBox(height: 40),
-              const CustomButton(
+              CustomButton(
                 routeName: '/login',
                 buttonText: 'Iniciar Sesión',
+                onPressed: login,
               ),
               const SizedBox(height: 20),
 
