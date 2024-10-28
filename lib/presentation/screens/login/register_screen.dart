@@ -2,6 +2,10 @@ import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field.d
 import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
 import 'package:flutter/material.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -53,6 +57,43 @@ class RegisterElementsState extends State<RegisterElements> {
       GlobalKey<CustomTextFieldState>();
   String? errorMessage;
 
+  Future<void> _registerUser() async {
+    if (formKey.currentState?.validate() ?? false) {
+      final name = nameKey.currentState?.textValue;
+      final email = emailKey.currentState?.textValue;
+      final password = passwordKey.currentState?.textValue;
+
+      if (name != null && email != null && password != null) {
+        const String url = 'https://api.tuapi.com/register'; //cambiar por url de la api
+
+        try {
+          final response = await http.post(
+            Uri.parse(url),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'name': name,
+              'email': email,
+              'password': password,
+            }),
+          );
+
+          if (response.statusCode == 201) {
+            print('Usuario registrado exitosamente');
+            Navigator.pushNamed(context, '/login');
+          } else {
+            throw Exception('Error en el registro: ${response.body}');
+          }
+        } catch (e) {
+          setState(() {
+            errorMessage = 'Error al registrar el usuario: $e';
+          });
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -83,7 +124,7 @@ class RegisterElementsState extends State<RegisterElements> {
           const CustomButton(
             routeName: '/login',
             buttonText: 'Registrarse',
-            
+
           ),
           const SizedBox(height: 20),
           GestureDetector(
@@ -104,3 +145,4 @@ class RegisterElementsState extends State<RegisterElements> {
     );
   }
 }
+
