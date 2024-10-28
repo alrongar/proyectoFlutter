@@ -5,8 +5,6 @@ import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart'
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-
-
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
@@ -56,15 +54,17 @@ class RegisterElementsState extends State<RegisterElements> {
   final GlobalKey<CustomTextFieldState> nameKey =
       GlobalKey<CustomTextFieldState>();
   String? errorMessage;
+  String selectedUserType = 'u'; // Valor inicial
 
   Future<void> _registerUser() async {
     if (formKey.currentState?.validate() ?? false) {
       final name = nameKey.currentState?.textValue;
       final email = emailKey.currentState?.textValue;
       final password = passwordKey.currentState?.textValue;
-
+      final rol = selectedUserType;
       if (name != null && email != null && password != null) {
-        const String url = 'https://api.tuapi.com/register'; //cambiar por url de la api
+        const String url =
+            'https://api.tuapi.com/register'; //cambiar por url de la api
 
         try {
           final response = await http.post(
@@ -76,6 +76,7 @@ class RegisterElementsState extends State<RegisterElements> {
               'name': name,
               'email': email,
               'password': password,
+              'userType': rol, 
             }),
           );
 
@@ -120,6 +121,31 @@ class RegisterElementsState extends State<RegisterElements> {
             isPassword: true,
             isRequired: true,
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Radio<String>(
+                value: 'u', // Valor para 'Usuario'
+                groupValue: selectedUserType,
+                onChanged: (String? value) {
+                  setState(() {
+                    selectedUserType = value!;
+                  });
+                },
+              ),
+              const Text('Usuario'),
+              Radio<String>(
+                value: 'o', // Valor para 'Organizador'
+                groupValue: selectedUserType,
+                onChanged: (String? value) {
+                  setState(() {
+                    selectedUserType = value!;
+                  });
+                },
+              ),
+              const Text('Organizador'),
+            ],
+          ),
           const SizedBox(height: 40),
           CustomButton(
             routeName: '/login',
@@ -145,4 +171,3 @@ class RegisterElementsState extends State<RegisterElements> {
     );
   }
 }
-
