@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
   final String buttonText; // Texto que mostrará el botón
-  final String routeName; // Ruta a la que navegará al presionar el botón
+  //final String routeName; // Ruta a la que navegará al presionar el botón
   final VoidCallback? onPressed;
   
   const CustomButton({
     required this.buttonText,
-    required this.routeName,
+    //required this.routeName,
     super.key, 
     this.onPressed,
   });
@@ -15,10 +15,7 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        Navigator.pushNamed(
-            context, routeName); // Navegar a la ruta especificada
-      },
+      onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF1A1A2E), // Color de fondo del botón
         shape: RoundedRectangleBorder(

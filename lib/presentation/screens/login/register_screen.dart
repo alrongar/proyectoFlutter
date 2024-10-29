@@ -57,6 +57,7 @@ class RegisterElementsState extends State<RegisterElements> {
   String selectedUserType = 'u'; // Valor inicial
 
   Future<void> _registerUser() async {
+    print("inicio del registro");
     if (formKey.currentState?.validate() ?? false) {
       final name = nameKey.currentState?.textValue;
       final email = emailKey.currentState?.textValue;
@@ -64,23 +65,24 @@ class RegisterElementsState extends State<RegisterElements> {
       final role = selectedUserType;
       if (name != null && email != null && password != null) {
         const String url =
-            'https://eventify.allsites.es/public/api/'; //cambiar por url de la api
+            'https://eventify.allsites.es/public/api/register'; //cambiar por url de la api
 
         try {
           final response = await http.post(
             Uri.parse(url),
             headers: {
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json', 'Accept': 'application/json',
             },
             body: jsonEncode({
               'name': name,
               'email': email,
               'password': password,
-              'userType': role, 
+              'c_password': password,
+              'role': role,
             }),
           );
-
-          if (response.statusCode == 201) {
+          
+          if (response.statusCode == 200) {
             print('Usuario registrado exitosamente');
             Navigator.pushNamed(context, '/login');
           } else {
@@ -89,6 +91,7 @@ class RegisterElementsState extends State<RegisterElements> {
         } catch (e) {
           setState(() {
             errorMessage = 'Error al registrar el usuario: $e';
+            print(errorMessage);
           });
         }
       }
@@ -97,6 +100,7 @@ class RegisterElementsState extends State<RegisterElements> {
 
   @override
   Widget build(BuildContext context) {
+    print("pantalla de registro:");
     return Form(
       key: formKey,
       child: Column(
@@ -148,10 +152,13 @@ class RegisterElementsState extends State<RegisterElements> {
           ),
           const SizedBox(height: 40),
           CustomButton(
-            routeName: '/login',
-            buttonText: 'Registrarse',
-            onPressed: _registerUser,
-          ),
+              //routeName: '/login',
+              buttonText: 'Registrarse',
+              onPressed: () async {
+                await _registerUser();
+
+                
+              }),
           const SizedBox(height: 20),
           GestureDetector(
             onTap: () {
