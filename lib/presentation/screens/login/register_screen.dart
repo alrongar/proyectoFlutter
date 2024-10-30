@@ -13,24 +13,26 @@ class RegisterScreen extends StatelessWidget {
     return const Scaffold(
       body: GradientBackground(
         title: '',
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: Image(
-                  image: AssetImage('assets/Eventify_logo.png'),
-                  width:
-                      230, // Ajuste de tamaño más pequeño para ocupar menos espacio
-                  height: 230,
-                  fit: BoxFit
-                      .contain, // Ajusta el tamaño sin agregar espacio extra
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 32.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Image(
+                    image: AssetImage('assets/Eventify_logo.png'),
+                    width:
+                        230, // Ajuste de tamaño más pequeño para ocupar menos espacio
+                    height: 230,
+                    fit: BoxFit
+                        .contain, // Ajusta el tamaño sin agregar espacio extra
+                  ),
                 ),
-              ),
-              RegisterElements(), // Espacio flexible inferior
-            ],
+                RegisterElements(), // Espacio flexible inferior
+              ],
+            ),
           ),
         ),
       ),
@@ -71,7 +73,8 @@ class RegisterElementsState extends State<RegisterElements> {
           final response = await http.post(
             Uri.parse(url),
             headers: {
-              'Content-Type': 'application/json', 'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
             },
             body: jsonEncode({
               'name': name,
@@ -81,7 +84,7 @@ class RegisterElementsState extends State<RegisterElements> {
               'role': role,
             }),
           );
-          
+
           if (response.statusCode == 200) {
             print('Usuario registrado exitosamente');
             Navigator.pushNamed(context, '/login');
@@ -156,8 +159,6 @@ class RegisterElementsState extends State<RegisterElements> {
               buttonText: 'Registrarse',
               onPressed: () async {
                 await _registerUser();
-
-                
               }),
           const SizedBox(height: 20),
           GestureDetector(
