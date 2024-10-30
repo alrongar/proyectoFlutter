@@ -22,6 +22,12 @@ class LoginScreenState extends State<LoginScreen> {
   Future<void> login() async {
     final email = emailKey.currentState?.textValue;
     final password = passwordKey.currentState?.textValue;
+    final Map<String, String> translatedMessages ={
+      'User or password incorrect':'Datos incorrectos',
+      'Email don\'t confirmed': 'Email no confirmado',
+      'User don\'t activated': 'Email no activado',
+      'User deleted': 'Usuario eliminado'
+    };
 
     try {
       final response = await http.post(
@@ -39,9 +45,10 @@ class LoginScreenState extends State<LoginScreen> {
       );
       print(email);
       print(password);
+      final Map<String, dynamic> data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         // Manejar respuesta exitosa
-        final data = jsonDecode(response.body);
+        
         print('Login exitoso: $data');
         Navigator.pushNamed(context, '/login');
 
@@ -49,8 +56,10 @@ class LoginScreenState extends State<LoginScreen> {
       } else {
         // Manejar error
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Credenciales incorrectas')),
+          SnackBar(content: Text('${translatedMessages[data['data']['error']]}')),
+          
         );
+        
         print(response.body);
       }
     } catch (e) {
