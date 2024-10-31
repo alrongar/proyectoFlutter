@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -44,10 +45,14 @@ class LoginScreenState extends State<LoginScreen> {
       final data = jsonDecode(response.body);
       print('Respuesta de la API: ${response.body}');
       if (response.statusCode == 200) {
+        final token = data['data']['token']; // Obtener el token
         final role = data['data']['role'];
-        
+
+        // Almacenar el token en SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', token);
+
         if (role == "a") {
-          
           Navigator.pushNamed(context, '/admin');
         } else if (role == 'o' || role == 'u') {
           Navigator.pushNamed(context, '/home');
