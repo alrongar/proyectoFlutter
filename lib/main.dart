@@ -4,6 +4,7 @@ import 'package:eventify_flutter/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:eventify_flutter/presentation/screens/login/login_screen.dart';
+import 'package:eventify_flutter/presentation/screens/users/admin_user_screen.dart';
 
 void main() {
   runApp(
@@ -28,8 +29,8 @@ class MyApp extends StatelessWidget {
         initialRoute: '/login',
         routes: {
           '/login': (context) => const LoginScreen(),
-          '/register': (context) =>
-              const RegisterScreen(), 
+          '/register': (context) => const RegisterScreen(),
+          '/admin': (context) => const AdminUserScreen(), 
         });
   }
 }

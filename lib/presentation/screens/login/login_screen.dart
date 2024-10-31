@@ -44,9 +44,11 @@ class LoginScreenState extends State<LoginScreen> {
       final data = jsonDecode(response.body);
       print('Respuesta de la API: ${response.body}');
       if (response.statusCode == 200) {
-        final role = data['role'];
-        if (role == 'a') {
-          Navigator.pushNamed(context, 'users/admin_user_screen');
+        final role = data['data']['role'];
+        
+        if (role == "a") {
+          
+          Navigator.pushNamed(context, '/admin');
         } else if (role == 'o' || role == 'u') {
           Navigator.pushNamed(context, '/home');
         } else {
@@ -63,6 +65,7 @@ class LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e) {
+      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error en el inicio de sesión')),
       );

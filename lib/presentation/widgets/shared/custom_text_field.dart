@@ -6,14 +6,15 @@ class CustomTextField extends StatefulWidget {
   final String? regularExpression;
   final bool isRequired;
   final String? regExpErrorMessage;
-
+  final GlobalKey<CustomTextFieldState>? matchingKey;
   const CustomTextField({
     super.key,
     this.hintTextContent = '',
     this.isPassword = false,
     this.regularExpression,
     this.isRequired = false,
-    this.regExpErrorMessage,
+    this.regExpErrorMessage, 
+    this.matchingKey, 
   });
 
   @override
@@ -23,6 +24,8 @@ class CustomTextField extends StatefulWidget {
 class CustomTextFieldState extends State<CustomTextField> {
   final TextEditingController textController = TextEditingController();
   bool _isValid = false;
+  
+  
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +50,7 @@ class CustomTextFieldState extends State<CustomTextField> {
     );
 
     return TextFormField(
+      
       controller: textController,
       focusNode: focusNode,
       decoration: inputDecoration,
@@ -74,6 +78,10 @@ class CustomTextFieldState extends State<CustomTextField> {
       if (!regex.hasMatch(textFieldValue)) {
         return 'Entrada inválida';
       }
+    }
+    if (widget.matchingKey != null &&
+        textFieldValue != widget.matchingKey?.currentState?.textValue) {
+      return 'Las contraseñas no coinciden';
     }
     return null;
   }

@@ -49,20 +49,24 @@ class RegisterElementsState extends State<RegisterElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey<CustomTextFieldState> emailKey = GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> c_passwordKey = GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> nameKey = GlobalKey<CustomTextFieldState>();
+  
   String? errorMessage;
   String selectedUserType = 'u'; // Valor inicial
 
   Future<void> _registerUser() async {
-    print("inicio del registro");
+
+
     if (formKey.currentState?.validate() ?? false) {
       final name = nameKey.currentState?.textValue;
       final email = emailKey.currentState?.textValue;
       final password = passwordKey.currentState?.textValue;
+      final c_password = c_passwordKey.currentState?.textValue;
       final role = selectedUserType;
       if (name != null && email != null && password != null) {
         const String url = 'https://eventify.allsites.es/public/api/register'; // Cambiar por URL de la API
-
+        print(name);
         try {
           final response = await http.post(
             Uri.parse(url),
@@ -74,7 +78,7 @@ class RegisterElementsState extends State<RegisterElements> {
               'name': name,
               'email': email,
               'password': password,
-              'c_password': password,
+              'c_password': c_password,
               'role': role,
             }),
           );
@@ -83,9 +87,11 @@ class RegisterElementsState extends State<RegisterElements> {
             print('Usuario registrado exitosamente');
             Navigator.pushNamed(context, '/login');
           } else {
+            print(response.statusCode);
             throw Exception('Error en el registro: ${response.body}');
           }
         } catch (e) {
+          
           setState(() {
             errorMessage = 'Error al registrar el usuario: $e';
             print(errorMessage);
@@ -97,7 +103,8 @@ class RegisterElementsState extends State<RegisterElements> {
 
   @override
   Widget build(BuildContext context) {
-    print("pantalla de registro:");
+    
+
     return Form(
       key: formKey,
       child: Column(
@@ -120,6 +127,15 @@ class RegisterElementsState extends State<RegisterElements> {
             hintTextContent: 'Contraseña',
             isPassword: true,
             isRequired: true,
+            
+          ),
+          const SizedBox(height: 20),
+          CustomTextField(
+            key: c_passwordKey,
+            hintTextContent: 'Confirmar contraseña',
+            isPassword: true,
+            isRequired: true,
+            matchingKey: passwordKey,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
