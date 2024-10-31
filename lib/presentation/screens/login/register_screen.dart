@@ -13,7 +13,7 @@ class RegisterScreen extends StatelessWidget {
     return const Scaffold(
       body: GradientBackground(
         title: '',
-        child: SingleChildScrollView(
+        child: SingleChildScrollView( // Asegúrate de envolver en un SingleChildScrollView
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 32.0),
             child: Column(
@@ -23,14 +23,12 @@ class RegisterScreen extends StatelessWidget {
                   alignment: Alignment.topCenter,
                   child: Image(
                     image: AssetImage('assets/Eventify_logo.png'),
-                    width:
-                        230, // Ajuste de tamaño más pequeño para ocupar menos espacio
+                    width: 230,
                     height: 230,
-                    fit: BoxFit
-                        .contain, // Ajusta el tamaño sin agregar espacio extra
+                    fit: BoxFit.contain,
                   ),
                 ),
-                RegisterElements(), // Espacio flexible inferior
+                RegisterElements(),
               ],
             ),
           ),
@@ -49,12 +47,9 @@ class RegisterElements extends StatefulWidget {
 
 class RegisterElementsState extends State<RegisterElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<CustomTextFieldState> emailKey =
-      GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> passwordKey =
-      GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> nameKey =
-      GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> emailKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> nameKey = GlobalKey<CustomTextFieldState>();
   String? errorMessage;
   String selectedUserType = 'u'; // Valor inicial
 
@@ -66,8 +61,7 @@ class RegisterElementsState extends State<RegisterElements> {
       final password = passwordKey.currentState?.textValue;
       final role = selectedUserType;
       if (name != null && email != null && password != null) {
-        const String url =
-            'https://eventify.allsites.es/public/api/register'; //cambiar por url de la api
+        const String url = 'https://eventify.allsites.es/public/api/register'; // Cambiar por URL de la API
 
         try {
           final response = await http.post(
@@ -118,8 +112,7 @@ class RegisterElementsState extends State<RegisterElements> {
           CustomTextField(
             key: emailKey,
             hintTextContent: 'Email',
-            regularExpression:
-                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+            regularExpression: r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
           ),
           const SizedBox(height: 20),
           CustomTextField(
@@ -131,35 +124,17 @@ class RegisterElementsState extends State<RegisterElements> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Radio<String>(
-                value: 'u', // Valor para 'Usuario'
-                groupValue: selectedUserType,
-                onChanged: (String? value) {
-                  setState(() {
-                    selectedUserType = value!;
-                  });
-                },
-              ),
-              const Text('Usuario'),
-              Radio<String>(
-                value: 'o', // Valor para 'Organizador'
-                groupValue: selectedUserType,
-                onChanged: (String? value) {
-                  setState(() {
-                    selectedUserType = value!;
-                  });
-                },
-              ),
-              const Text('Organizador'),
+              _buildRadio('u', 'Usuario'), // Mueve el estilo aquí
+              _buildRadio('o', 'Organizador'), // Mueve el estilo aquí
             ],
           ),
           const SizedBox(height: 40),
           CustomButton(
-              //routeName: '/login',
-              buttonText: 'Registrarse',
-              onPressed: () async {
-                await _registerUser();
-              }),
+            buttonText: 'Registrarse',
+            onPressed: () async {
+              await _registerUser();
+            },
+          ),
           const SizedBox(height: 20),
           GestureDetector(
             onTap: () {
@@ -173,9 +148,31 @@ class RegisterElementsState extends State<RegisterElements> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-          )
+          ),
         ],
       ),
+    );
+  }
+
+  // Función para construir el botón de opción (radio button) con estilo
+  Widget _buildRadio(String value, String label) {
+    return Row(
+      children: [
+        Radio<String>(
+          value: value,
+          groupValue: selectedUserType,
+          onChanged: (String? newValue) {
+            setState(() {
+              selectedUserType = newValue!;
+            });
+          },
+          activeColor: Colors.blue, // Cambiar color del radio button seleccionado
+        ),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white), // Cambiar color del texto
+        ),
+      ],
     );
   }
 }
