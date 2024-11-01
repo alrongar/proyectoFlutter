@@ -24,6 +24,7 @@ class _UserEditScreenState extends State<UserEditScreen> {
       name = newNameKey.currentState!.textValue;
     }
     UserService.updateUser(widget.id, name);
+    Navigator.pushNamed(context, "/admin");
   }
 
   @override
