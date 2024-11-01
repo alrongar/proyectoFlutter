@@ -49,7 +49,7 @@ class RegisterElementsState extends State<RegisterElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey<CustomTextFieldState> emailKey = GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> c_passwordKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> cPasswordKey = GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> nameKey = GlobalKey<CustomTextFieldState>();
 
   String? errorMessage;
@@ -60,11 +60,10 @@ class RegisterElementsState extends State<RegisterElements> {
       final name = nameKey.currentState?.textValue;
       final email = emailKey.currentState?.textValue;
       final password = passwordKey.currentState?.textValue;
-      final c_password = c_passwordKey.currentState?.textValue;
+      final cPassword = cPasswordKey.currentState?.textValue;
       final role = selectedUserType;
       if (name != null && email != null && password != null) {
         const String url = 'https://eventify.allsites.es/public/api/register'; // Cambiar por URL de la API
-        print(name);
         try {
           final response = await http.post(
             Uri.parse(url),
@@ -76,22 +75,20 @@ class RegisterElementsState extends State<RegisterElements> {
               'name': name,
               'email': email,
               'password': password,
-              'c_password': c_password,
+              'c_password': cPassword,
               'role': role,
             }),
           );
 
           if (response.statusCode == 200) {
-            print('Usuario registrado exitosamente');
+          if (!mounted) return;
             Navigator.pushNamed(context, '/login');
           } else {
-            print(response.statusCode);
             throw Exception('Error en el registro: ${response.body}');
           }
         } catch (e) {
           setState(() {
             errorMessage = 'Error al registrar el usuario: $e';
-            print(errorMessage);
           });
         }
       }
@@ -125,7 +122,7 @@ class RegisterElementsState extends State<RegisterElements> {
           ),
           const SizedBox(height: 20),
           CustomTextField(
-            key: c_passwordKey,
+            key: cPasswordKey,
             hintTextContent: 'Confirmar contraseña',
             isPassword: true,
             isRequired: true,

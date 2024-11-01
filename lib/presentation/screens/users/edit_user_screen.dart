@@ -11,10 +11,10 @@ class UserEditScreen extends StatefulWidget {
   const UserEditScreen({super.key, required this.id});
 
   @override
-  _UserEditScreenState createState() => _UserEditScreenState();
+  UserEditScreenState createState() => UserEditScreenState();
 }
 
-class _UserEditScreenState extends State<UserEditScreen> {
+class UserEditScreenState extends State<UserEditScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey<CustomTextFieldState> newNameKey = GlobalKey<CustomTextFieldState>();
 

@@ -2,17 +2,16 @@ import 'dart:convert';
 import 'package:eventify_flutter/presentation/screens/users/edit_user_screen.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../../providers/UserService.dart';
 
 class UserListScreen extends StatefulWidget {
-  const UserListScreen({Key? key}) : super(key: key);
+  const UserListScreen({super.key});
 
   @override
-  _UserListScreenState createState() => _UserListScreenState();
+  UserListScreenState createState() => UserListScreenState();
 }
 
-class _UserListScreenState extends State<UserListScreen> {
+class UserListScreenState extends State<UserListScreen> {
   List<dynamic> users = []; // Lista para almacenar los usuarios
 
   @override
@@ -29,10 +28,6 @@ class _UserListScreenState extends State<UserListScreen> {
       setState(() {
         users = jsonResponse['data']; // Almacenamos los usuarios en la lista
       });
-    } else {
-      // Manejo de errores
-      print('Error: ${response.statusCode}');
-      print('Mensaje: ${response.body}');
     }
   }
 
@@ -101,10 +96,10 @@ class _UserListScreenState extends State<UserListScreen> {
                             onPressed: () {
                               UserService.activateUser(id);
                             },
-                            child: const Text('Activar'),
                             style: buttonStyle.copyWith(
-                              backgroundColor: MaterialStateProperty.all(Colors.green),
+                              backgroundColor: const WidgetStatePropertyAll(Colors.green),
                             ),
+                            child: const Text('Activar'),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -113,10 +108,10 @@ class _UserListScreenState extends State<UserListScreen> {
                             onPressed: () {
                               UserService.deactivateUser(id);
                             },
-                            child: const Text('Desactivar'),
                             style: buttonStyle.copyWith(
-                              backgroundColor: MaterialStateProperty.all(Colors.red),
+                              backgroundColor: const WidgetStatePropertyAll(Colors.red),
                             ),
+                            child: const Text('Desactivar'),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -130,10 +125,10 @@ class _UserListScreenState extends State<UserListScreen> {
                                 ),
                               );
                             },
-                            child: const Text('Editar'),
                             style: buttonStyle.copyWith(
-                              backgroundColor: MaterialStateProperty.all(Colors.blue),
+                              backgroundColor: const WidgetStatePropertyAll(Colors.blue),
                             ),
+                            child: const Text('Editar'),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -142,10 +137,10 @@ class _UserListScreenState extends State<UserListScreen> {
                             onPressed: () {
                               UserService.deleteUser(id);
                             },
-                            child: const Text('Eliminar'),
                             style: buttonStyle.copyWith(
-                              backgroundColor: MaterialStateProperty.all(Colors.grey),
+                              backgroundColor: const WidgetStatePropertyAll(Colors.grey),
                             ),
+                            child: const Text('Eliminar'),
                           ),
                         ),
                       ],

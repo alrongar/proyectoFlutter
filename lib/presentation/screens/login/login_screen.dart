@@ -43,7 +43,6 @@ class LoginScreenState extends State<LoginScreen> {
       );
 
       final data = jsonDecode(response.body);
-      print('Respuesta de la API: ${response.body}');
       if (response.statusCode == 200) {
         final token = data['data']['token']; // Obtener el token
         final role = data['data']['role'];
@@ -51,7 +50,7 @@ class LoginScreenState extends State<LoginScreen> {
         // Almacenar el token en SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
-
+        if (!mounted) return;
         if (role == "a") {
           Navigator.pushNamed(context, '/admin');
         } else if (role == 'o' || role == 'u') {
@@ -65,12 +64,12 @@ class LoginScreenState extends State<LoginScreen> {
         // Mostrar mensaje de error traducido si existe, o mensaje genérico
         final error = data['data']?['error'] ?? 'Error desconocido';
         final errorMessage = translatedMessages[error] ?? 'Error al iniciar sesión';
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMessage)),
         );
       }
     } catch (e) {
-      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error en el inicio de sesión')),
       );
