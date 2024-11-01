@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:eventify_flutter/presentation/screens/users/edit_user_screen.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
 import 'package:flutter/material.dart';
-import '../../../providers/UserService.dart';
+import '../../../providers/user_service.dart';
 
 class UserListScreen extends StatefulWidget {
   const UserListScreen({super.key});

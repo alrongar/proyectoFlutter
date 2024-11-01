@@ -47,10 +47,14 @@ class RegisterElements extends StatefulWidget {
 
 class RegisterElementsState extends State<RegisterElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<CustomTextFieldState> emailKey = GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> cPasswordKey = GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> nameKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> emailKey =
+      GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> passwordKey =
+      GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> cPasswordKey =
+      GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> nameKey =
+      GlobalKey<CustomTextFieldState>();
 
   String? errorMessage;
   String selectedUserType = 'u'; // Valor inicial
@@ -63,7 +67,7 @@ class RegisterElementsState extends State<RegisterElements> {
       final cPassword = cPasswordKey.currentState?.textValue;
       final role = selectedUserType;
       if (name != null && email != null && password != null) {
-        const String url = 'https://eventify.allsites.es/public/api/register'; // Cambiar por URL de la API
+        const String url = 'https://eventify.allsites.es/public/api/register';
         try {
           final response = await http.post(
             Uri.parse(url),
@@ -81,7 +85,7 @@ class RegisterElementsState extends State<RegisterElements> {
           );
 
           if (response.statusCode == 200) {
-          if (!mounted) return;
+            if (!mounted) return;
             Navigator.pushNamed(context, '/login');
           } else {
             throw Exception('Error en el registro: ${response.body}');
@@ -111,7 +115,8 @@ class RegisterElementsState extends State<RegisterElements> {
           CustomTextField(
             key: emailKey,
             hintTextContent: 'Email',
-            regularExpression: r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+            regularExpression:
+                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
           ),
           const SizedBox(height: 20),
           CustomTextField(
@@ -126,20 +131,27 @@ class RegisterElementsState extends State<RegisterElements> {
             hintTextContent: 'Confirmar contraseña',
             isPassword: true,
             isRequired: true,
-            matchingKey: passwordKey,
           ),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildRadio('u', 'Usuario'), // Mueve el estilo aquí
-              _buildRadio('o', 'Organizador'), // Mueve el estilo aquí
+              _buildRadio('u', 'Usuario'),
+              _buildRadio('o', 'Organizador'),
             ],
           ),
           const SizedBox(height: 20),
           CustomButton(
             buttonText: 'Registrarse',
             onPressed: () async {
+              String? textValue = cPasswordKey.currentState?.textValue;
+              if (textValue != null &&
+                  textValue != passwordKey.currentState?.textValue) {
+                setState(() {
+                  errorMessage = 'Las contraseñas no coinciden';
+                });
+                return;
+              }
               await _registerUser();
             },
           ),
@@ -174,11 +186,13 @@ class RegisterElementsState extends State<RegisterElements> {
               selectedUserType = newValue!;
             });
           },
-          activeColor: const Color(0xFF1E88E5), // Cambiar color del radio button seleccionado
+          activeColor: const Color(
+              0xFF1E88E5), // Cambia el color del radio button seleccionado
         ),
         Text(
           label,
-          style: const TextStyle(color: Colors.white), // Cambiar color del texto
+          style:
+              const TextStyle(color: Colors.white), // Cambia el color del texto
         ),
       ],
     );

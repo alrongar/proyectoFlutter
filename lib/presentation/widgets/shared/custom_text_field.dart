@@ -6,7 +6,6 @@ class CustomTextField extends StatefulWidget {
   final String? regularExpression;
   final bool isRequired;
   final String? regExpErrorMessage;
-  final GlobalKey<CustomTextFieldState>? matchingKey;
 
   const CustomTextField({
     super.key,
@@ -15,7 +14,6 @@ class CustomTextField extends StatefulWidget {
     this.regularExpression,
     this.isRequired = false,
     this.regExpErrorMessage,
-    this.matchingKey,
   });
 
   @override
@@ -55,15 +53,14 @@ class CustomTextFieldState extends State<CustomTextField> {
       obscureText: widget.isPassword,
       validator: (value) {
         final validationResult =
-        validateExpression(textFieldValue: value ?? '');
+            validateExpression(textFieldValue: value ?? '');
         setState(() {
           _isValid = validationResult == null;
         });
         return validationResult;
       },
-      style: const TextStyle(color: Colors.white,fontSize: 18),
+      style: const TextStyle(color: Colors.white, fontSize: 18),
       maxLines: 1,
-
     );
   }
 
@@ -77,10 +74,6 @@ class CustomTextFieldState extends State<CustomTextField> {
       if (!regex.hasMatch(textFieldValue)) {
         return 'Entrada inválida';
       }
-    }
-    if (widget.matchingKey != null &&
-        textFieldValue != widget.matchingKey?.currentState?.textValue) {
-      return 'Las contraseñas no coinciden';
     }
     return null;
   }

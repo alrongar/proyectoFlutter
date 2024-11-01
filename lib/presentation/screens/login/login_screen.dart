@@ -1,5 +1,6 @@
 import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
+import 'package:eventify_flutter/providers/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
 import 'package:http/http.dart' as http;
@@ -28,13 +29,6 @@ class LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    final translatedMessages = {
-      'User or password incorrect': 'Datos incorrectos',
-      'Email don\'t confirmed': 'Email no confirmado',
-      'User don\'t activated': 'Email no activado',
-      'User deleted': 'Usuario eliminado',
-    };
-
     try {
       final response = await http.post(
         Uri.parse('https://eventify.allsites.es/public/api/login'),
@@ -62,8 +56,10 @@ class LoginScreenState extends State<LoginScreen> {
         }
       } else {
         // Mostrar mensaje de error traducido si existe, o mensaje genérico
-        final error = data['data']?['error'] ?? 'Error desconocido';
-        final errorMessage = translatedMessages[error] ?? 'Error al iniciar sesión';
+        var errorMessage = UserService.getTranslatedMessage(data);
+        if(errorMessage == 'Error desconocido') {
+          errorMessage = 'Error en el inicio de sesión';
+        }
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMessage)),

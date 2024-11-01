@@ -30,9 +30,8 @@ class UserService extends ChangeNotifier {
     Map<String, String> headers = await _getHeaders();
     var body = json.encode({"id": id});
 
-    var response = await http.post(Uri.parse(url), headers: headers, body: body);
-    print("Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
+    var response =
+        await http.post(Uri.parse(url), headers: headers, body: body);
 
     if (response.statusCode != 200) {
       throw Exception('Error: ${response.body}');
@@ -46,8 +45,6 @@ class UserService extends ChangeNotifier {
     var headers = await _getHeaders();
 
     var response = await http.get(url, headers: headers);
-    print("Obtener Usuarios - Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
 
     if (response.statusCode != 200) {
       throw Exception('Error: ${response.body}');
@@ -62,8 +59,6 @@ class UserService extends ChangeNotifier {
     var body = json.encode({"id": userId});
 
     var response = await http.post(url, headers: headers, body: body);
-    print("Eliminar Usuario - Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
 
     if (response.statusCode != 200) {
       throw Exception('Error: ${response.body}');
@@ -81,13 +76,24 @@ class UserService extends ChangeNotifier {
     });
 
     var response = await http.post(url, headers: headers, body: body);
-    print("Actualizar Usuario - Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
 
     if (response.statusCode != 200) {
       throw Exception('Error: ${response.body}');
     }
 
     return response;
+  }
+
+  static String getTranslatedMessage(Map<String, dynamic> data) {
+    final error = data['data']?['error'] ?? 'Error desconocido';
+
+    final translatedMessages = {
+      'User or password incorrect': 'Datos incorrectos',
+      'Email don\'t confirmed': 'Email no confirmado',
+      'User don\'t activated': 'Email no activado',
+      'User deleted': 'Usuario eliminado',
+    };
+
+    return translatedMessages[error] ?? 'Error desconocido';
   }
 }

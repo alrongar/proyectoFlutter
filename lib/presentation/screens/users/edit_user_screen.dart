@@ -1,6 +1,6 @@
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
-import 'package:eventify_flutter/providers/UserService.dart';
+import 'package:eventify_flutter/providers/user_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/shared/custom_text_field.dart';
