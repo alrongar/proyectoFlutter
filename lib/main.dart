@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/admin': (context) => const UserListScreen(),
+        
       },
     );
   }
