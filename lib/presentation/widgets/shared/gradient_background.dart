@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class GradientBackground extends StatelessWidget {
@@ -16,34 +17,34 @@ class GradientBackground extends StatelessWidget {
       backgroundColor: Colors.transparent, // Fondo transparente
       body: Stack(
         children: [
-          // Fondo de gradiente en orientación vertical
+          // Fondo de gradiente en orientación vertical con tonos azul y blanco
           Container(
             width: double.infinity,
             height: double.infinity,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFF1A1A2E), // Azul oscuro
-                  Color(0xFF16213E), // Azul más oscuro
-                  Color(0xFF0F3460), // Azul medianoche
-                  Color(0xFF53354A), // Morado oscuro
+                  Color(0xFFE3F2FD), // Azul muy claro (casi blanco)
+                  Color(0xFF90CAF9), // Azul claro
+                  Color(0xFF42A5F5), // Azul intermedio
+                  Color(0xFF1E88E5), // Azul intenso
                 ],
-                stops: [0.1, 0.3, 0.5, 1.0],
+                stops: [0.1, 0.3, 0.6, 1.0],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
             ),
           ),
-          // Contenido principal con el título
+          // Contenido principal con el título centrado
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: Colors.tealAccent.shade100,
+                  color: Colors.white, // Color blanco para el título
                   fontFamily: 'Lobster',
                 ),
               ),

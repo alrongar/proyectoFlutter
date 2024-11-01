@@ -7,14 +7,15 @@ class CustomTextField extends StatefulWidget {
   final bool isRequired;
   final String? regExpErrorMessage;
   final GlobalKey<CustomTextFieldState>? matchingKey;
+
   const CustomTextField({
     super.key,
     this.hintTextContent = '',
     this.isPassword = false,
     this.regularExpression,
     this.isRequired = false,
-    this.regExpErrorMessage, 
-    this.matchingKey, 
+    this.regExpErrorMessage,
+    this.matchingKey,
   });
 
   @override
@@ -24,8 +25,6 @@ class CustomTextField extends StatefulWidget {
 class CustomTextFieldState extends State<CustomTextField> {
   final TextEditingController textController = TextEditingController();
   bool _isValid = false;
-  
-  
 
   @override
   Widget build(BuildContext context) {
@@ -50,21 +49,21 @@ class CustomTextFieldState extends State<CustomTextField> {
     );
 
     return TextFormField(
-      
       controller: textController,
       focusNode: focusNode,
       decoration: inputDecoration,
       obscureText: widget.isPassword,
       validator: (value) {
         final validationResult =
-            validateExpression(textFieldValue: value ?? '');
+        validateExpression(textFieldValue: value ?? '');
         setState(() {
           _isValid = validationResult == null;
         });
         return validationResult;
       },
-      style: const TextStyle(color: Colors.black),
+      style: const TextStyle(color: Colors.white,fontSize: 18),
       maxLines: 1,
+
     );
   }
 

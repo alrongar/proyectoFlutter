@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
   final String buttonText; // Texto que mostrará el botón
-  //final String routeName; // Ruta a la que navegará al presionar el botón
   final VoidCallback? onPressed;
-  
+
   const CustomButton({
     required this.buttonText,
-    //required this.routeName,
-    super.key, 
+    super.key,
     this.onPressed,
   });
 
@@ -17,15 +15,14 @@ class CustomButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF1A1A2E), // Color de fondo del botón
+        backgroundColor: const Color(0xFF1E88E5), // Color de fondo del botón (azul intermedio)
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30), // Bordes más redondeados
         ),
         padding: const EdgeInsets.symmetric(vertical: 18), // Espaciado interno
         elevation: 8, // Sombra para dar profundidad
         shadowColor: Colors.black.withOpacity(0.5), // Color de sombra
-        minimumSize:
-            const Size(200, 60), // Tamaño mínimo del botón (ancho, alto)
+        minimumSize: const Size(200, 60), // Tamaño mínimo del botón (ancho, alto)
       ),
       child: Text(
         buttonText,
@@ -38,3 +35,4 @@ class CustomButton extends StatelessWidget {
     );
   }
 }
+

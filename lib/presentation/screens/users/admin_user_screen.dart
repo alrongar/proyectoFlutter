@@ -38,110 +38,126 @@ class _UserListScreenState extends State<UserListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Estilo uniforme para los botones con tamaño de fuente reducido
+    final ButtonStyle buttonStyle = ElevatedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(vertical: 14.0),
+      textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+      minimumSize: const Size.fromHeight(50), // Tamaño uniforme
+    );
+
     return Scaffold(
-        appBar: AppBar(
-            title: const Text('Administración de Usuarios'),
-            iconTheme: const IconThemeData(color: Colors.white),
-            backgroundColor: const Color.fromARGB(255, 44, 60, 75),
-            centerTitle: true,
-            titleTextStyle: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            )),
-        body: users.isEmpty
-            ? const Center(child: CircularProgressIndicator())
-            : GradientBackground(
-                title: '',
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16.0),
-                  itemCount: users.length,
-                  itemBuilder: (context, index) {
-                    var user = users[index];
-                    var id = user['id'];
-                    var name = user['name'];
-                    var email = user['email'];
-                    var role = user['role'];
-                    if (role == 'u') {
-                      role = 'Usuario';
-                    } else if (role == 'o') {
-                      role = 'Organizador';
-                    }
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 8.0),
-                      color: const Color.fromARGB(255, 82, 112, 138),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                           ListTile(
-                            leading: const Icon(Icons.person, size: 40),
-                            title: Text(
-                              '$name($role)',
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text('$email'),
-                          ),
-                          const SizedBox(
-                              height:
-                                  16), // Espacio entre ListTile y los botones
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    UserService.activateUser(id);
-                                  },
-                                  child: const Text('Activar',
-                                  style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    UserService.deactivateUser(id);
-                                  },
-                                  child: const Text('Desactivar',
-                                  style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => UserEditScreen(id: id.toString()),));
-                                  },
-                                  child: const Text('Editar',
-                                  style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    UserService.deleteUser(id);
-                                  },
-                                  child: const Text('Eliminar',
-                                  style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+      appBar: AppBar(
+        title: const Text('Administración de Usuarios'),
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: const Color.fromARGB(255, 44, 60, 75),
+        centerTitle: true,
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      body: users.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : GradientBackground(
+        title: '',
+        child: ListView.builder(
+          padding: const EdgeInsets.all(16.0),
+          itemCount: users.length,
+          itemBuilder: (context, index) {
+            var user = users[index];
+            var id = user['id'];
+            var name = user['name'];
+            var email = user['email'];
+            var role = user['role'];
+            if (role == 'u') {
+              role = 'Usuario';
+            } else if (role == 'o') {
+              role = 'Organizador';
+            }
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 8.0),
+              color: const Color(0xFFBBDEFB), // Azul medio
+              child: Padding(
+                padding: const EdgeInsets.all(16.0), // Espaciado interno
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.person, size: 40),
+                      title: Text(
+                        '$name ($role)',
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                    );
-                  },
+                      subtitle: Text('$email'),
+                    ),
+                    const SizedBox(height: 16), // Espacio entre ListTile y los botones
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              UserService.activateUser(id);
+                            },
+                            child: const Text('Activar'),
+                            style: buttonStyle.copyWith(
+                              backgroundColor: MaterialStateProperty.all(Colors.green),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              UserService.deactivateUser(id);
+                            },
+                            child: const Text('Desactivar'),
+                            style: buttonStyle.copyWith(
+                              backgroundColor: MaterialStateProperty.all(Colors.red),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UserEditScreen(id: id.toString()),
+                                ),
+                              );
+                            },
+                            child: const Text('Editar'),
+                            style: buttonStyle.copyWith(
+                              backgroundColor: MaterialStateProperty.all(Colors.blue),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              UserService.deleteUser(id);
+                            },
+                            child: const Text('Eliminar'),
+                            style: buttonStyle.copyWith(
+                              backgroundColor: MaterialStateProperty.all(Colors.grey),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16), // Espacio adicional entre los botones y el fondo del Card
+                  ],
                 ),
-              ));
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 }

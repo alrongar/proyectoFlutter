@@ -13,9 +13,9 @@ class RegisterScreen extends StatelessWidget {
     return const Scaffold(
       body: GradientBackground(
         title: '',
-        child: SingleChildScrollView( // Asegúrate de envolver en un SingleChildScrollView
+        child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 32.0),
+            padding: EdgeInsets.symmetric(horizontal: 35.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -23,8 +23,8 @@ class RegisterScreen extends StatelessWidget {
                   alignment: Alignment.topCenter,
                   child: Image(
                     image: AssetImage('assets/Eventify_logo.png'),
-                    width: 230,
-                    height: 230,
+                    width: 180,
+                    height: 180,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -51,13 +51,11 @@ class RegisterElementsState extends State<RegisterElements> {
   final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> c_passwordKey = GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> nameKey = GlobalKey<CustomTextFieldState>();
-  
+
   String? errorMessage;
   String selectedUserType = 'u'; // Valor inicial
 
   Future<void> _registerUser() async {
-
-
     if (formKey.currentState?.validate() ?? false) {
       final name = nameKey.currentState?.textValue;
       final email = emailKey.currentState?.textValue;
@@ -91,7 +89,6 @@ class RegisterElementsState extends State<RegisterElements> {
             throw Exception('Error en el registro: ${response.body}');
           }
         } catch (e) {
-          
           setState(() {
             errorMessage = 'Error al registrar el usuario: $e';
             print(errorMessage);
@@ -103,8 +100,6 @@ class RegisterElementsState extends State<RegisterElements> {
 
   @override
   Widget build(BuildContext context) {
-    
-
     return Form(
       key: formKey,
       child: Column(
@@ -127,7 +122,6 @@ class RegisterElementsState extends State<RegisterElements> {
             hintTextContent: 'Contraseña',
             isPassword: true,
             isRequired: true,
-            
           ),
           const SizedBox(height: 20),
           CustomTextField(
@@ -137,6 +131,7 @@ class RegisterElementsState extends State<RegisterElements> {
             isRequired: true,
             matchingKey: passwordKey,
           ),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -144,7 +139,7 @@ class RegisterElementsState extends State<RegisterElements> {
               _buildRadio('o', 'Organizador'), // Mueve el estilo aquí
             ],
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
           CustomButton(
             buttonText: 'Registrarse',
             onPressed: () async {
@@ -182,7 +177,7 @@ class RegisterElementsState extends State<RegisterElements> {
               selectedUserType = newValue!;
             });
           },
-          activeColor: Colors.blue, // Cambiar color del radio button seleccionado
+          activeColor: const Color(0xFF1E88E5), // Cambiar color del radio button seleccionado
         ),
         Text(
           label,
