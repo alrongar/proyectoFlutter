@@ -27,12 +27,6 @@ class UserListScreenState extends State<UserListScreen> {
       setState(() {
         users = jsonResponse['data'];
       });
-<<<<<<< HEAD
-    } else {
-      print('Error: ${response.statusCode}');
-      print('Mensaje: ${response.body}');
-=======
->>>>>>> d9ef370e42ebf17adb90c8c32885cb458a4a6870
     }
   }
 
@@ -62,8 +56,7 @@ class UserListScreenState extends State<UserListScreen> {
             var id = user['id'];
             var name = user['name'];
             var role = user['role'];
-            var isActive = user['active'] == 1; // Comprueba si active es 1 para marcar como activo
-
+            var isActive = user['actived'] == 1; // Comprueba si active es 1 para marcar como activo
             if (role == 'u') role = 'Usuario';
             else if (role == 'o') role = 'Organizador';
 
@@ -101,20 +94,20 @@ class UserListScreenState extends State<UserListScreen> {
                 },
                 child: Stack(
                   children: [
-<<<<<<< HEAD
                     // Fondo con botones que se muestran al deslizar
                     Positioned.fill(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          SizedBox(width: 10), // Espacio para que los botones no se superpongan con la tarjeta
+                          const SizedBox(width: 10), // Espacio para que los botones no se superpongan con la tarjeta
                           // Botón para activar/desactivar el usuario
                           if (!isActive) // Si el usuario está inactivo
                             _buildIconButton(
                               icon: Icons.check,
                               color: Colors.green,
                               onPressed: () async {
-                                await UserService.activateUser(id);
+                                await UserService.activateUser(id.toString());
+                                
                                 fetchUsers(); // Actualiza la lista de usuarios
                               },
                             )
@@ -123,7 +116,8 @@ class UserListScreenState extends State<UserListScreen> {
                               icon: Icons.block,
                               color: Colors.orange,
                               onPressed: () async {
-                                await UserService.deactivateUser(id);
+                                await UserService.deactivateUser(id.toString());
+                                
                                 fetchUsers(); // Actualiza la lista de usuarios
                               },
                             ),
@@ -131,47 +125,6 @@ class UserListScreenState extends State<UserListScreen> {
                           _buildIconButton(
                             icon: Icons.edit,
                             color: Colors.blue,
-=======
-                    ListTile(
-                      leading: const Icon(Icons.person, size: 40),
-                      title: Text(
-                        '$name ($role)',
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text('$email'),
-                    ),
-                    const SizedBox(height: 16), // Espacio entre ListTile y los botones
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              UserService.activateUser(id);
-                            },
-                            style: buttonStyle.copyWith(
-                              backgroundColor: const WidgetStatePropertyAll(Colors.green),
-                            ),
-                            child: const Text('Activar'),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              UserService.deactivateUser(id);
-                            },
-                            style: buttonStyle.copyWith(
-                              backgroundColor: const WidgetStatePropertyAll(Colors.red),
-                            ),
-                            child: const Text('Desactivar'),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: ElevatedButton(
->>>>>>> d9ef370e42ebf17adb90c8c32885cb458a4a6870
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -182,13 +135,6 @@ class UserListScreenState extends State<UserListScreen> {
                                 fetchUsers(); // Actualiza la lista después de volver
                               });
                             },
-<<<<<<< HEAD
-=======
-                            style: buttonStyle.copyWith(
-                              backgroundColor: const WidgetStatePropertyAll(Colors.blue),
-                            ),
-                            child: const Text('Editar'),
->>>>>>> d9ef370e42ebf17adb90c8c32885cb458a4a6870
                           ),
                           // Botón para eliminar el usuario
                           _buildIconButton(
@@ -197,7 +143,7 @@ class UserListScreenState extends State<UserListScreen> {
                             onPressed: () async {
                               bool confirmed = await _showDeleteConfirmationDialog();
                               if (confirmed) {
-                                var response = await UserService.deleteUser(id);
+                                var response = await UserService.deleteUser(id.toString());
                                 if (response.statusCode == 200) { // Verificamos que la respuesta sea correcta
                                   fetchUsers(); // Actualiza la lista de usuarios
                                 } else {
@@ -208,13 +154,6 @@ class UserListScreenState extends State<UserListScreen> {
                                 }
                               }
                             },
-<<<<<<< HEAD
-=======
-                            style: buttonStyle.copyWith(
-                              backgroundColor: const WidgetStatePropertyAll(Colors.grey),
-                            ),
-                            child: const Text('Eliminar'),
->>>>>>> d9ef370e42ebf17adb90c8c32885cb458a4a6870
                           ),
                         ],
                       ),

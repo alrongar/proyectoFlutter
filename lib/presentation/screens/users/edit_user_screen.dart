@@ -22,12 +22,8 @@ class UserEditScreenState extends State<UserEditScreen> {
     if (formKey.currentState?.validate() ?? false) {
       name = newNameKey.currentState!.textValue;
       await UserService.updateUser(widget.id, name); // Asegúrate de que la función sea asíncrona
+      Navigator.pop(context); // Vuelve a la pantalla anterior después de actualizar
     }
-<<<<<<< HEAD
-=======
-    UserService.updateUser(widget.id, name);
-    Navigator.pushNamed(context, "/admin");
->>>>>>> d9ef370e42ebf17adb90c8c32885cb458a4a6870
   }
 
   @override
@@ -66,7 +62,6 @@ class UserEditScreenState extends State<UserEditScreen> {
                       buttonText: 'Actualizar',
                       onPressed: () async {
                         await editUser(); // Espera la actualización
-                        Navigator.pop(context); // Vuelve a la pantalla anterior
                       },
                     ),
                   ],
