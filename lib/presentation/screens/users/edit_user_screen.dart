@@ -2,7 +2,6 @@ import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart'
 import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
 import 'package:eventify_flutter/providers/UserService.dart';
 import 'package:flutter/material.dart';
-
 import '../../widgets/shared/custom_text_field.dart';
 
 class UserEditScreen extends StatefulWidget {
@@ -22,8 +21,8 @@ class _UserEditScreenState extends State<UserEditScreen> {
     var name = '';
     if (formKey.currentState?.validate() ?? false) {
       name = newNameKey.currentState!.textValue;
+      await UserService.updateUser(widget.id, name); // Asegúrate de que la función sea asíncrona
     }
-    UserService.updateUser(widget.id, name);
   }
 
   @override
@@ -61,7 +60,8 @@ class _UserEditScreenState extends State<UserEditScreen> {
                     CustomButton(
                       buttonText: 'Actualizar',
                       onPressed: () async {
-                        editUser();
+                        await editUser(); // Espera la actualización
+                        Navigator.pop(context); // Vuelve a la pantalla anterior
                       },
                     ),
                   ],
