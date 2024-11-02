@@ -1,6 +1,6 @@
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
-import 'package:eventify_flutter/providers/UserService.dart';
+import 'package:eventify_flutter/providers/user_service.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/shared/custom_text_field.dart';
 
@@ -10,10 +10,10 @@ class UserEditScreen extends StatefulWidget {
   const UserEditScreen({super.key, required this.id});
 
   @override
-  _UserEditScreenState createState() => _UserEditScreenState();
+  UserEditScreenState createState() => UserEditScreenState();
 }
 
-class _UserEditScreenState extends State<UserEditScreen> {
+class UserEditScreenState extends State<UserEditScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey<CustomTextFieldState> newNameKey = GlobalKey<CustomTextFieldState>();
 
@@ -23,6 +23,11 @@ class _UserEditScreenState extends State<UserEditScreen> {
       name = newNameKey.currentState!.textValue;
       await UserService.updateUser(widget.id, name); // Asegúrate de que la función sea asíncrona
     }
+<<<<<<< HEAD
+=======
+    UserService.updateUser(widget.id, name);
+    Navigator.pushNamed(context, "/admin");
+>>>>>>> d9ef370e42ebf17adb90c8c32885cb458a4a6870
   }
 
   @override

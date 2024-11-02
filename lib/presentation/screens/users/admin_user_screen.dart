@@ -2,17 +2,16 @@ import 'dart:convert';
 import 'package:eventify_flutter/presentation/screens/users/edit_user_screen.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../providers/UserService.dart';
+import '../../../providers/user_service.dart';
 
 class UserListScreen extends StatefulWidget {
-  const UserListScreen({Key? key}) : super(key: key);
+  const UserListScreen({super.key});
 
   @override
-  _UserListScreenState createState() => _UserListScreenState();
+  UserListScreenState createState() => UserListScreenState();
 }
 
-class _UserListScreenState extends State<UserListScreen> {
+class UserListScreenState extends State<UserListScreen> {
   List<dynamic> users = []; // Lista para almacenar los usuarios
 
   @override
@@ -28,9 +27,12 @@ class _UserListScreenState extends State<UserListScreen> {
       setState(() {
         users = jsonResponse['data'];
       });
+<<<<<<< HEAD
     } else {
       print('Error: ${response.statusCode}');
       print('Mensaje: ${response.body}');
+=======
+>>>>>>> d9ef370e42ebf17adb90c8c32885cb458a4a6870
     }
   }
 
@@ -99,6 +101,7 @@ class _UserListScreenState extends State<UserListScreen> {
                 },
                 child: Stack(
                   children: [
+<<<<<<< HEAD
                     // Fondo con botones que se muestran al deslizar
                     Positioned.fill(
                       child: Row(
@@ -128,6 +131,47 @@ class _UserListScreenState extends State<UserListScreen> {
                           _buildIconButton(
                             icon: Icons.edit,
                             color: Colors.blue,
+=======
+                    ListTile(
+                      leading: const Icon(Icons.person, size: 40),
+                      title: Text(
+                        '$name ($role)',
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text('$email'),
+                    ),
+                    const SizedBox(height: 16), // Espacio entre ListTile y los botones
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              UserService.activateUser(id);
+                            },
+                            style: buttonStyle.copyWith(
+                              backgroundColor: const WidgetStatePropertyAll(Colors.green),
+                            ),
+                            child: const Text('Activar'),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              UserService.deactivateUser(id);
+                            },
+                            style: buttonStyle.copyWith(
+                              backgroundColor: const WidgetStatePropertyAll(Colors.red),
+                            ),
+                            child: const Text('Desactivar'),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+>>>>>>> d9ef370e42ebf17adb90c8c32885cb458a4a6870
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -138,6 +182,13 @@ class _UserListScreenState extends State<UserListScreen> {
                                 fetchUsers(); // Actualiza la lista después de volver
                               });
                             },
+<<<<<<< HEAD
+=======
+                            style: buttonStyle.copyWith(
+                              backgroundColor: const WidgetStatePropertyAll(Colors.blue),
+                            ),
+                            child: const Text('Editar'),
+>>>>>>> d9ef370e42ebf17adb90c8c32885cb458a4a6870
                           ),
                           // Botón para eliminar el usuario
                           _buildIconButton(
@@ -157,6 +208,13 @@ class _UserListScreenState extends State<UserListScreen> {
                                 }
                               }
                             },
+<<<<<<< HEAD
+=======
+                            style: buttonStyle.copyWith(
+                              backgroundColor: const WidgetStatePropertyAll(Colors.grey),
+                            ),
+                            child: const Text('Eliminar'),
+>>>>>>> d9ef370e42ebf17adb90c8c32885cb458a4a6870
                           ),
                         ],
                       ),

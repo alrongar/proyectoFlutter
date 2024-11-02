@@ -1,6 +1,6 @@
 import 'package:eventify_flutter/config/theme/app_theme.dart';
 import 'package:eventify_flutter/presentation/screens/login/register_screen.dart';
-import 'package:eventify_flutter/providers/UserService.dart';
+import 'package:eventify_flutter/providers/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:eventify_flutter/presentation/screens/login/login_screen.dart';
