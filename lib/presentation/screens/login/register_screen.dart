@@ -48,13 +48,13 @@ class RegisterElements extends StatefulWidget {
 class RegisterElementsState extends State<RegisterElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey<CustomTextFieldState> emailKey =
-  GlobalKey<CustomTextFieldState>();
+      GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> passwordKey =
-  GlobalKey<CustomTextFieldState>();
+      GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> cPasswordKey =
-  GlobalKey<CustomTextFieldState>();
+      GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> nameKey =
-  GlobalKey<CustomTextFieldState>();
+      GlobalKey<CustomTextFieldState>();
 
   String? errorMessage;
   String selectedUserType = 'u'; // Valor inicial
@@ -83,17 +83,25 @@ class RegisterElementsState extends State<RegisterElements> {
               'role': role,
             }),
           );
-
+          final data = jsonDecode(response.body);
           if (response.statusCode == 200) {
             if (!mounted) return;
             Navigator.pushNamed(context, '/login');
           } else {
-            throw Exception('Error en el registro: ${response.body}');
+            
+            errorMessage = 'Error en el registro de usuario';
+            if (data['exception'] == "Illuminate\\Database\\UniqueConstraintViolationException") {
+              errorMessage = 'Email ya registrado';
+            }
+            
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(errorMessage!)),
+            );
           }
         } catch (e) {
-          setState(() {
-            errorMessage = 'Error al registrar el usuario: $e';
-          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error en el registro de usuario')),
+          );
         }
       }
     }
@@ -116,7 +124,7 @@ class RegisterElementsState extends State<RegisterElements> {
             key: emailKey,
             hintTextContent: 'Email',
             regularExpression:
-            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
           ),
           const SizedBox(height: 20),
           CustomTextField(
