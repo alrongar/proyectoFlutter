@@ -96,4 +96,31 @@ class UserService extends ChangeNotifier {
 
     return translatedMessages[error] ?? 'Error desconocido';
   }
+
+  static Future<http.Response> registerUser(String name, String email, String password, String role) async {
+    var url = Uri.parse('$baseUrl/register');
+    var body = json.encode({
+      "name": name,
+      "email": email,
+      "password": password,
+      "c_password": password, //
+      "role": role,
+    });
+
+    var response = await http.post(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+
+    if (response.statusCode == 200) {
+      return response;
+    } else {
+      throw Exception('Error al registrar el usuario: ${response.body}');
+    }
+  }
+
 }
