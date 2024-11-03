@@ -48,13 +48,13 @@ class RegisterElements extends StatefulWidget {
 class RegisterElementsState extends State<RegisterElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final GlobalKey<CustomTextFieldState> emailKey =
-      GlobalKey<CustomTextFieldState>();
+  GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> passwordKey =
-      GlobalKey<CustomTextFieldState>();
+  GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> cPasswordKey =
-      GlobalKey<CustomTextFieldState>();
+  GlobalKey<CustomTextFieldState>();
   final GlobalKey<CustomTextFieldState> nameKey =
-      GlobalKey<CustomTextFieldState>();
+  GlobalKey<CustomTextFieldState>();
 
   String? errorMessage;
   String selectedUserType = 'u'; // Valor inicial
@@ -116,7 +116,7 @@ class RegisterElementsState extends State<RegisterElements> {
             key: emailKey,
             hintTextContent: 'Email',
             regularExpression:
-                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
           ),
           const SizedBox(height: 20),
           CustomTextField(
@@ -186,13 +186,11 @@ class RegisterElementsState extends State<RegisterElements> {
               selectedUserType = newValue!;
             });
           },
-          activeColor: const Color(
-              0xFF1E88E5), // Cambia el color del radio button seleccionado
+          activeColor: Colors.black,
         ),
         Text(
           label,
-          style:
-              const TextStyle(color: Colors.white), // Cambia el color del texto
+          style: const TextStyle(color: Colors.white),
         ),
       ],
     );

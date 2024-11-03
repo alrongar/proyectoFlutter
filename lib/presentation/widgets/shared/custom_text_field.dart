@@ -31,8 +31,8 @@ class CustomTextFieldState extends State<CustomTextField> {
     final inputDecoration = InputDecoration(
       hintText: widget.hintTextContent,
       contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
-      enabledBorder: UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.grey.shade300),
+      enabledBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(color: Colors.black),
       ),
       focusedBorder: UnderlineInputBorder(
         borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
@@ -43,7 +43,7 @@ class CustomTextFieldState extends State<CustomTextField> {
       focusedErrorBorder: const UnderlineInputBorder(
         borderSide: BorderSide(color: Colors.red),
       ),
-      hintStyle: TextStyle(color: Colors.grey.shade500),
+      hintStyle: const TextStyle(color: Colors.black), // Color del hint a negro
     );
 
     return TextFormField(
@@ -52,14 +52,13 @@ class CustomTextFieldState extends State<CustomTextField> {
       decoration: inputDecoration,
       obscureText: widget.isPassword,
       validator: (value) {
-        final validationResult =
-            validateExpression(textFieldValue: value ?? '');
+        final validationResult = validateExpression(textFieldValue: value ?? '');
         setState(() {
           _isValid = validationResult == null;
         });
         return validationResult;
       },
-      style: const TextStyle(color: Colors.white, fontSize: 18),
+      style: const TextStyle(color: Colors.black, fontSize: 18), // Color del texto a negro
       maxLines: 1,
     );
   }
@@ -68,8 +67,7 @@ class CustomTextFieldState extends State<CustomTextField> {
     if (widget.isRequired && textFieldValue.isEmpty) {
       return 'Este campo no puede estar vacío';
     }
-    if (widget.regularExpression != null &&
-        widget.regularExpression!.isNotEmpty) {
+    if (widget.regularExpression != null && widget.regularExpression!.isNotEmpty) {
       final regex = RegExp(widget.regularExpression!);
       if (!regex.hasMatch(textFieldValue)) {
         return 'Entrada inválida';

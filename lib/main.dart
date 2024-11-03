@@ -1,10 +1,14 @@
-import 'package:eventify_flutter/config/theme/app_theme.dart';
+// main.dart
+import 'package:eventify_flutter/presentation/screens/login/login_screen.dart';
 import 'package:eventify_flutter/presentation/screens/login/register_screen.dart';
+import 'package:eventify_flutter/presentation/screens/users/admin_user_screen.dart';
+import 'package:eventify_flutter/presentation/screens/users/user_home_screen.dart';
 import 'package:eventify_flutter/providers/user_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:eventify_flutter/presentation/screens/login/login_screen.dart';
-import 'package:eventify_flutter/presentation/screens/users/admin_user_screen.dart';
+
+import 'config/theme/app_theme.dart'; // Importamos la nueva pantalla
 
 void main() {
   runApp(
@@ -31,9 +35,10 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/admin': (context) => const UserListScreen(),
-        
+        '/home': (context) => const UserHomeScreen(),
       },
     );
   }
 }
+
 

@@ -1,10 +1,10 @@
+import 'dart:convert';
 import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
 import 'package:eventify_flutter/providers/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -38,26 +38,18 @@ class LoginScreenState extends State<LoginScreen> {
 
       final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        final token = data['data']['token']; // Obtener el token
+        final token = data['data']['token'];
         final role = data['data']['role'];
 
-        // Almacenar el token en SharedPreferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
+        await prefs.setString('role', role);
+
         if (!mounted) return;
-        if (role == "a") {
-          Navigator.pushNamed(context, '/admin');
-        } else if (role == 'o' || role == 'u') {
-          Navigator.pushNamed(context, '/home');
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Rol desconocido')),
-          );
-        }
+        Navigator.pushNamed(context, '/home');
       } else {
-        // Mostrar mensaje de error traducido si existe, o mensaje genérico
         var errorMessage = UserService.getTranslatedMessage(data);
-        if(errorMessage == 'Error desconocido') {
+        if (errorMessage == 'Error desconocido') {
           errorMessage = 'Error en el inicio de sesión';
         }
         if (!mounted) return;
@@ -82,7 +74,6 @@ class LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo en la parte superior
               Align(
                 alignment: Alignment.topCenter,
                 child: Image.asset(
@@ -92,7 +83,7 @@ class LoginScreenState extends State<LoginScreen> {
                   fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 10), // Espaciado entre el logo y el formulario
+              const SizedBox(height: 20), // Espaciado ajustado
               Form(
                 key: formKey,
                 child: Column(
@@ -118,8 +109,6 @@ class LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     const SizedBox(height: 20),
-
-                    // Link de registro
                     GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(context, '/register');
@@ -127,7 +116,7 @@ class LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         '¿No tienes una cuenta? Regístrate aquí',
                         style: TextStyle(
-                          fontSize: 13.0,
+                          fontSize: 15.0, // Tamaño de texto ajustado
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),

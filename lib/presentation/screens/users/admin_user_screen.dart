@@ -36,7 +36,7 @@ class UserListScreenState extends State<UserListScreen> {
       appBar: AppBar(
         title: const Text('Administración de Usuarios'),
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: const Color.fromARGB(255, 44, 60, 75),
+        backgroundColor: const Color(0xFF4CAF50), // Color claro
         centerTitle: true,
         titleTextStyle: const TextStyle(
           color: Colors.white,
@@ -53,138 +53,122 @@ class UserListScreenState extends State<UserListScreen> {
           itemCount: users.length,
           itemBuilder: (context, index) {
             var user = users[index];
-            var id = user['id'];
-            var name = user['name'];
-            var role = user['role'];
-            var isActive = user['actived'] == 1; // Comprueba si active es 1 para marcar como activo
-            if (role == 'u') role = 'Usuario';
-            else if (role == 'o') role = 'Organizador';
-
-            double offsetX = 0.0; // Desplazamiento horizontal inicial
-            bool isSwiped = false; // Indica si la tarjeta está deslizada
-
-            return StatefulBuilder(
-              builder: (context, setState) => GestureDetector(
-                onHorizontalDragUpdate: (details) {
-                  setState(() {
-                    offsetX += details.primaryDelta!; // Actualiza el desplazamiento
-                    if (offsetX > 200) {
-                      offsetX = 200; // Limita el desplazamiento a 200 píxeles
-                    }
-                  });
-                },
-                onHorizontalDragEnd: (details) {
-                  setState(() {
-                    // Mantiene la posición si se alcanzó el límite
-                    if (offsetX >= 200) {
-                      isSwiped = true; // Marca la tarjeta como deslizada
-                    } else {
-                      offsetX = 0; // Restaura la posición si no se alcanza el límite
-                    }
-                  });
-                },
-                onTap: () {
-                  // Vuelve a la posición inicial si se ha deslizado
-                  if (isSwiped) {
-                    setState(() {
-                      offsetX = 0; // Restaura la posición
-                      isSwiped = false; // Resetea el estado de deslizar
-                    });
-                  }
-                },
-                child: Stack(
-                  children: [
-                    // Fondo con botones que se muestran al deslizar
-                    Positioned.fill(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const SizedBox(width: 10), // Espacio para que los botones no se superpongan con la tarjeta
-                          // Botón para activar/desactivar el usuario
-                          if (!isActive) // Si el usuario está inactivo
-                            _buildIconButton(
-                              icon: Icons.check,
-                              color: Colors.green,
-                              onPressed: () async {
-                                await UserService.activateUser(id.toString());
-                                
-                                fetchUsers(); // Actualiza la lista de usuarios
-                              },
-                            )
-                          else // Si el usuario está activo
-                            _buildIconButton(
-                              icon: Icons.block,
-                              color: Colors.orange,
-                              onPressed: () async {
-                                await UserService.deactivateUser(id.toString());
-                                
-                                fetchUsers(); // Actualiza la lista de usuarios
-                              },
-                            ),
-                          // Botón para editar el usuario
-                          _buildIconButton(
-                            icon: Icons.edit,
-                            color: Colors.blue,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => UserEditScreen(id: id.toString()),
-                                ),
-                              ).then((_) {
-                                fetchUsers(); // Actualiza la lista después de volver
-                              });
-                            },
-                          ),
-                          // Botón para eliminar el usuario
-                          _buildIconButton(
-                            icon: Icons.delete,
-                            color: Colors.red,
-                            onPressed: () async {
-                              bool confirmed = await _showDeleteConfirmationDialog();
-                              if (confirmed) {
-                                var response = await UserService.deleteUser(id.toString());
-                                if (response.statusCode == 200) { // Verificamos que la respuesta sea correcta
-                                  fetchUsers(); // Actualiza la lista de usuarios
-                                } else {
-                                  // Manejo de error si la eliminación falla
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Error al eliminar el usuario: ${response.body}')),
-                                  );
-                                }
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Tarjeta de usuario que se desliza
-                    Transform.translate(
-                      offset: Offset(offsetX, 0),
-                      child: Card(
-                        margin: const EdgeInsets.symmetric(vertical: 8.0),
-                        color: const Color(0xFFBBDEFB),
-                        child: ListTile(
-                          leading: const Icon(Icons.person, size: 40),
-                          title: Text(
-                            '$name ($role)',
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
+            return _buildUserCard(user);
           },
         ),
       ),
     );
   }
 
-  // Método para mostrar el diálogo de confirmación de eliminación
+  Widget _buildUserCard(dynamic user) {
+    var id = user['id'];
+    var name = user['name'];
+    var role = user['role'] == 'u' ? 'Usuario' : 'Organizador';
+    var isActive = user['actived'] == 1;
+
+    double offsetX = 0.0;
+    bool isSwiped = false;
+
+    return StatefulBuilder(
+      builder: (context, setState) => GestureDetector(
+        onHorizontalDragUpdate: (details) {
+          setState(() {
+            offsetX += details.primaryDelta!;
+            if (offsetX > 200) {
+              offsetX = 200;
+            }
+          });
+        },
+        onHorizontalDragEnd: (details) {
+          setState(() {
+            if (offsetX >= 200) {
+              isSwiped = true;
+            } else {
+              offsetX = 0;
+            }
+          });
+        },
+        onTap: () {
+          if (isSwiped) {
+            setState(() {
+              offsetX = 0;
+              isSwiped = false;
+            });
+          }
+        },
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const SizedBox(width: 10),
+                  _buildActionButton(
+                    icon: isActive ? Icons.block : Icons.check,
+                    color: isActive ? Colors.orange : Colors.green,
+                    onPressed: () async {
+                      if (isActive) {
+                        await UserService.deactivateUser(id.toString());
+                      } else {
+                        await UserService.activateUser(id.toString());
+                      }
+                      fetchUsers();
+                    },
+                  ),
+                  _buildActionButton(
+                    icon: Icons.edit,
+                    color: Colors.amber, // Color del botón de editar cambiado
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserEditScreen(id: id.toString()),
+                        ),
+                      ).then((_) {
+                        fetchUsers();
+                      });
+                    },
+                  ),
+                  _buildActionButton(
+                    icon: Icons.delete,
+                    color: Colors.red,
+                    onPressed: () async {
+                      bool confirmed = await _showDeleteConfirmationDialog();
+                      if (confirmed) {
+                        var response = await UserService.deleteUser(id.toString());
+                        if (response.statusCode == 200) {
+                          fetchUsers();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error al eliminar el usuario: ${response.body}')),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Transform.translate(
+              offset: Offset(offsetX, 0),
+              child: Card(
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                color: const Color(0xFFBBDEFB),
+                child: ListTile(
+                  leading: const Icon(Icons.person, size: 40),
+                  title: Text(
+                    '$name ($role)',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<bool> _showDeleteConfirmationDialog() async {
     return await showDialog<bool>(
       context: context,
@@ -207,8 +191,7 @@ class UserListScreenState extends State<UserListScreen> {
     ) ?? false;
   }
 
-  // Widget para construir los botones de ícono
-  Widget _buildIconButton({
+  Widget _buildActionButton({
     required IconData icon,
     required Color color,
     required VoidCallback onPressed,

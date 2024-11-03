@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,46 +23,44 @@ class Menu extends StatelessWidget {
           return ListView(
             padding: EdgeInsets.zero,
             children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xff620091), Color(0xff8a0db7), Color(0xffb11adc)],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                color: const Color(0xFF0B3D91),
+                child: const Center(
+                  child: Text(
+                    'MENÚ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24, // Tamaño de fuente
+                      fontWeight: FontWeight.bold, // Negrita
+                    ),
                   ),
                 ),
-                child: Text(
-                  'Menú',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
-                ),
               ),
-              ListTile(
-                leading: const Icon(Icons.home),
-                title: const Text('Home'),
-                onTap: () {
-                  Navigator.pushNamed(context, '/home');
-                },
-              ),
-              // Mostrar "Users" solo si el usuario es administrador
+              _buildMenuItem(context, Icons.home, 'Home', '/home'),
               if (snapshot.data == true)
-                ListTile(
-                  leading: const Icon(Icons.account_box),
-                  title: const Text('Users'),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/users');
-                  },
-                ),
-              ListTile(
-                leading: const Icon(Icons.logout),
-                title: const Text('Logout'),
-                onTap: () {
-                  Navigator.pushNamed(context, '/login');
-                },
-              ),
+                _buildMenuItem(context, Icons.admin_panel_settings, 'Panel de Administrador', '/admin'),
+              _buildMenuItem(context, Icons.logout, 'Logout', '/login'),
             ],
           );
         },
       ),
+    );
+  }
+
+  Widget _buildMenuItem(BuildContext context, IconData icon, String title, String route) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.black),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      onTap: () {
+        Navigator.pushNamed(context, route);
+      },
     );
   }
 }
