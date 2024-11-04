@@ -1,9 +1,10 @@
-import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field.dart';
-import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
 import 'package:flutter/material.dart';
-import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
+import '../../../config/rutes/app_routes.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field.dart';
+import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
+import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -47,14 +48,10 @@ class RegisterElements extends StatefulWidget {
 
 class RegisterElementsState extends State<RegisterElements> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<CustomTextFieldState> emailKey =
-      GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> passwordKey =
-      GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> cPasswordKey =
-      GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> nameKey =
-      GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> emailKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> cPasswordKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> nameKey = GlobalKey<CustomTextFieldState>();
 
   String? errorMessage;
   String selectedUserType = 'u'; // Valor inicial
@@ -86,14 +83,12 @@ class RegisterElementsState extends State<RegisterElements> {
           final data = jsonDecode(response.body);
           if (response.statusCode == 200) {
             if (!mounted) return;
-            Navigator.pushNamed(context, '/login');
+            Navigator.pushNamed(context, AppRoutes.login);
           } else {
-            
             errorMessage = 'Error en el registro de usuario';
             if (data['exception'] == "Illuminate\\Database\\UniqueConstraintViolationException") {
               errorMessage = 'Email ya registrado';
             }
-            
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(errorMessage!)),
             );
@@ -123,8 +118,7 @@ class RegisterElementsState extends State<RegisterElements> {
           CustomTextField(
             key: emailKey,
             hintTextContent: 'Email',
-            regularExpression:
-                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+            regularExpression: r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
           ),
           const SizedBox(height: 20),
           CustomTextField(
@@ -166,7 +160,7 @@ class RegisterElementsState extends State<RegisterElements> {
           const SizedBox(height: 20),
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, '/login');
+              Navigator.pushNamed(context, AppRoutes.login);
             },
             child: const Text(
               '¿Ya tienes una cuenta? Inicia sesión aquí',
@@ -182,7 +176,6 @@ class RegisterElementsState extends State<RegisterElements> {
     );
   }
 
-  // Función para construir el botón de opción (radio button) con estilo
   Widget _buildRadio(String value, String label) {
     return Row(
       children: [

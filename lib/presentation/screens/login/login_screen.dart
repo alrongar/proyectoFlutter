@@ -7,6 +7,9 @@ import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart'
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+
+import '../../../config/rutes/app_routes.dart'; // Importar las rutas
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -46,7 +49,7 @@ class LoginScreenState extends State<LoginScreen> {
         await prefs.setString('role', role);
 
         if (!mounted) return;
-        Navigator.pushNamed(context, '/home');
+        Navigator.pushNamed(context, AppRoutes.home);
       } else {
         var errorMessage = UserService.getTranslatedMessage(data);
         if (errorMessage == 'Error desconocido') {
@@ -111,7 +114,7 @@ class LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, '/register');
+                        Navigator.pushNamed(context, AppRoutes.register);
                       },
                       child: const Text(
                         '¿No tienes una cuenta? Regístrate aquí',

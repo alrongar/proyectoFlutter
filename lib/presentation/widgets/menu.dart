@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../config/rutes/app_routes.dart';
 
 class Menu extends StatelessWidget {
   const Menu({super.key});
@@ -31,16 +32,17 @@ class Menu extends StatelessWidget {
                     'MENÚ',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 24, // Tamaño de fuente
-                      fontWeight: FontWeight.bold, // Negrita
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
-              _buildMenuItem(context, Icons.home, 'Home', '/home'),
+              _buildMenuItem(context, Icons.home, 'Home', AppRoutes.home),
+              _buildMenuItem(context, Icons.event, 'Eventos', AppRoutes.eventos), // Nueva opción para Eventos
               if (snapshot.data == true)
-                _buildMenuItem(context, Icons.admin_panel_settings, 'Panel de Administrador', '/admin'),
-              _buildMenuItem(context, Icons.logout, 'Logout', '/login'),
+                _buildMenuItem(context, Icons.admin_panel_settings, 'Panel de Administrador', AppRoutes.adminPanel),
+              _buildMenuItem(context, Icons.logout, 'Logout', AppRoutes.login),
             ],
           );
         },
