@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../providers/event_service.dart';
 import '../../../models/event.dart';
+import '../../../models/category.dart';
 import '../../widgets/cardevents/event_card.dart';
-
 
 class EventosScreen extends StatefulWidget {
   @override
@@ -12,25 +12,14 @@ class EventosScreen extends StatefulWidget {
 class _EventosScreenState extends State<EventosScreen> {
   final EventServices eventServices = EventServices();
   late Future<List<Evento>> eventos;
+  late Future<List<Category>> categories;
+  String selectedCategory = 'All';
 
   @override
   void initState() {
     super.initState();
     eventos = eventServices.fetchEventos(); // Obtener los eventos
-  }
-
-  // Función para asignar el color del borde dependiendo del tipo de evento
-  Color getBorderColor(String tipoEvento) {
-    switch (tipoEvento) {
-      case 'Music':
-        return Color(0xFFFFD700); // Amarillo para música
-      case 'Sport':
-        return Color(0xFFFF4500); // Naranja para deporte
-      case 'Tech':
-        return Color(0xFF4CAF50); // Verde para tecnología
-      default:
-        return Color(0xFF1096FB); // Azul como color predeterminado
-    }
+    categories = eventServices.fetchCategories(); // Obtener las categorías
   }
 
   @override
@@ -48,12 +37,15 @@ class _EventosScreenState extends State<EventosScreen> {
           } else if (snapshot.hasError) {
             return Center(child: Text("Error al cargar eventos"));
           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            List<Evento> eventos = snapshot.data!;
+            if (selectedCategory != 'All') {
+              eventos = eventos.where((evento) => evento.category == selectedCategory).toList();
+            }
             return ListView.builder(
-              itemCount: snapshot.data!.length,
+              itemCount: eventos.length,
               itemBuilder: (context, index) {
-                Evento evento = snapshot.data![index];
-                Color borderColor = getBorderColor(evento.tipo);
-                return EventCard(evento: evento, borderColor: borderColor); // Pasamos el color dinámico
+                Evento evento = eventos[index];
+                return EventCard(evento: evento, borderColor: Colors.blue); // Pasamos el color dinámico
               },
             );
           } else {
@@ -61,6 +53,60 @@ class _EventosScreenState extends State<EventosScreen> {
           }
         },
       ),
+      floatingActionButton: buildFilterButton(),
+    );
+  }
+
+  Widget buildFilterButton() {
+    return FloatingActionButton(
+      onPressed: () {
+        showModalBottomSheet(
+          context: context,
+          builder: (context) {
+            return FutureBuilder<List<Category>>(
+              future: categories,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error al cargar categorías"));
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      ListTile(
+                        leading: Icon(Icons.event),
+                        title: Text('Todos los eventos'),
+                        onTap: () {
+                          setState(() {
+                            selectedCategory = 'All';
+                          });
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ...snapshot.data!.map((category) {
+                        return ListTile(
+                          leading: Icon(Icons.category),
+                          title: Text(category.name),
+                          onTap: () {
+                            setState(() {
+                              selectedCategory = category.name;
+                            });
+                            Navigator.pop(context);
+                          },
+                        );
+                      }).toList(),
+                    ],
+                  );
+                } else {
+                  return Center(child: Text("No se encontraron categorías"));
+                }
+              },
+            );
+          },
+        );
+      },
+      child: Icon(Icons.filter_list),
     );
   }
 }

@@ -20,7 +20,6 @@ class Menu extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-
           return ListView(
             padding: EdgeInsets.zero,
             children: [
