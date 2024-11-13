@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:eventify_flutter/presentation/screens/users/edit_user_screen.dart';
-import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
 import 'package:flutter/material.dart';
 import '../../../providers/user_service.dart';
 
@@ -36,7 +35,7 @@ class UserListScreenState extends State<UserListScreen> {
       appBar: AppBar(
         title: const Text('Administración de Usuarios'),
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: const Color(0xFF4CAF50), // Color claro
+        backgroundColor: const Color(0xFF1A1A2E), // Azul oscuro
         centerTitle: true,
         titleTextStyle: const TextStyle(
           color: Colors.white,
@@ -46,8 +45,8 @@ class UserListScreenState extends State<UserListScreen> {
       ),
       body: users.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : GradientBackground(
-        title: '',
+          : Container(
+        color: const Color(0xFF0F3460), // Fondo de la pantalla oscuro (contraste)
         child: ListView.builder(
           padding: const EdgeInsets.all(16.0),
           itemCount: users.length,
@@ -104,8 +103,8 @@ class UserListScreenState extends State<UserListScreen> {
                 children: [
                   const SizedBox(width: 10),
                   _buildActionButton(
-                    icon: isActive ? Icons.block : Icons.check,
-                    color: isActive ? Colors.orange : Colors.green,
+                    icon: isActive ? Icons.check : Icons.block,
+                    color: isActive ? Colors.green : Colors.yellow, // Verde para activar, Amarillo para desactivar
                     onPressed: () async {
                       if (isActive) {
                         await UserService.deactivateUser(id.toString());
@@ -117,7 +116,7 @@ class UserListScreenState extends State<UserListScreen> {
                   ),
                   _buildActionButton(
                     icon: Icons.edit,
-                    color: Colors.amber, // Color del botón de editar cambiado
+                    color: const Color(0xFFFFA500)  ,
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -131,7 +130,7 @@ class UserListScreenState extends State<UserListScreen> {
                   ),
                   _buildActionButton(
                     icon: Icons.delete,
-                    color: Colors.red,
+                    color: Colors.red, // Rojo para eliminar
                     onPressed: () async {
                       bool confirmed = await _showDeleteConfirmationDialog();
                       if (confirmed) {
@@ -153,12 +152,16 @@ class UserListScreenState extends State<UserListScreen> {
               offset: Offset(offsetX, 0),
               child: Card(
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
-                color: const Color(0xFFBBDEFB),
+                color: Colors.white, // Color blanco para las tarjetas
                 child: ListTile(
-                  leading: const Icon(Icons.person, size: 40),
+                  leading: const Icon(Icons.person, size: 40, color: Color(0xFF0F3460)), // Azul medianoche
                   title: Text(
                     '$name ($role)',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black, // Letra en negro
+                    ),
                   ),
                 ),
               ),

@@ -187,7 +187,7 @@ class RegisterElementsState extends State<RegisterElements> {
               selectedUserType = newValue!;
             });
           },
-          activeColor: Colors.black,
+          activeColor: const Color(0xFFFFC300), // Amarillo
         ),
         Text(
           label,

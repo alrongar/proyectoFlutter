@@ -32,18 +32,18 @@ class CustomTextFieldState extends State<CustomTextField> {
       hintText: widget.hintTextContent,
       contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
       enabledBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.black),
+        borderSide: BorderSide(color: Color(0xFFFFC300)), // Amarillo en estado normal
       ),
-      focusedBorder: UnderlineInputBorder(
-        borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+      focusedBorder: const UnderlineInputBorder(
+        borderSide: BorderSide(color: Color(0xFFFFD60A), width: 2), // Amarillo más claro al enfocar
       ),
       errorBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.red),
+        borderSide: BorderSide(color: Colors.red), // Mantiene rojo en caso de error
       ),
       focusedErrorBorder: const UnderlineInputBorder(
         borderSide: BorderSide(color: Colors.red),
       ),
-      hintStyle: const TextStyle(color: Colors.black), // Color del hint a negro
+      hintStyle: const TextStyle(color: Colors.white), // Hint text en blanco
     );
 
     return TextFormField(
@@ -58,7 +58,7 @@ class CustomTextFieldState extends State<CustomTextField> {
         });
         return validationResult;
       },
-      style: const TextStyle(color: Colors.black, fontSize: 18), // Color del texto a negro
+      style: const TextStyle(color: Colors.white, fontSize: 18), // Texto en blanco
       maxLines: 1,
     );
   }

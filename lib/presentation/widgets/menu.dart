@@ -25,7 +25,7 @@ class Menu extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 40),
-                color: const Color(0xFF0B3D91),
+                color: const Color(0xFF1A1A2E),
                 child: const Center(
                   child: Text(
                     'MENÚ',

@@ -15,52 +15,56 @@ class EventCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: borderColor, width: 3),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Imagen del evento con bordes redondeados
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Stack(
+          children: [
+            // Imagen de fondo
+            Positioned.fill(
+              child: Image.network(
+                evento.imageUrl,
+                fit: BoxFit.cover,
+              ),
             ),
-            child: Image.network(
-              evento.imageUrl, // Asegúrate de que el campo sea imageUrl
-              height: 500, // Tamaño de la imagen
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-          // Detalles del evento
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Nombre del evento
-                Text(
-                  evento.title, // Asegúrate de que el campo sea title
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+            // Fondo oscuro semitransparente para la información
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
                 ),
-                const SizedBox(height: 5),
-                // Fecha del evento
-                Text(
-                  'Fecha: ${evento.startTime.day}/${evento.startTime.month}/${evento.startTime.year}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                const SizedBox(height: 15),
-                // Botón de acción (Ejemplo: Comprar entrada)
-              ],
+              ),
             ),
-          ),
-        ],
+            // Contenido encima de la imagen
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Nombre del evento
+                  Text(
+                    evento.title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  // Fecha del evento
+                  Text(
+                    'Fecha: ${evento.startTime.day}/${evento.startTime.month}/${evento.startTime.year}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  // Botón de acción (Ejemplo: Comprar entrada)
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

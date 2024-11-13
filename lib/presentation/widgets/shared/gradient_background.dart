@@ -13,26 +13,16 @@ class GradientBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color(0xFF001D3D), // Fondo azul oscuro
       body: Stack(
         children: [
+          // Fondo de color sólido
           Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFFA7DDFF),
-                  Color(0xFF68B9FF),
-                  Color(0xFF35A7FF),
-                  Color(0xFF1096FB),
-                ],
-                stops: [0.1, 0.4, 0.7, 1.0],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+            color: const Color(0xFF001D3D), // Azul oscuro
           ),
+          // Superposición negra transparente para mejorar el contraste
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -40,13 +30,14 @@ class GradientBackground extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   Colors.black.withOpacity(0.1),
-                  Colors.black.withOpacity(0.05),
+                  Colors.black.withOpacity(0.2),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
             ),
           ),
+          // Contenido principal
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -55,7 +46,7 @@ class GradientBackground extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A1A),
+                  color: Color(0xFF1A1A1A), // Usando el color $color_2
                   fontFamily: 'Lobster',
                 ),
               ),
