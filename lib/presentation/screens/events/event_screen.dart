@@ -14,22 +14,36 @@ class _EventosScreenState extends State<EventosScreen> {
   late Future<List<Evento>> eventos;
   late Future<List<Category>> categories;
   String selectedCategory = 'All';
-  bool isFilterVisible = false; // Estado para mostrar u ocultar los botones de filtro
+  bool isFilterVisible = false;
+
+  // colores
+  static const Color backgroundColor = Color(0xFF1A1A2E);
+  static const Color musicEventColor = Colors.yellow;
+  static const Color sportEventColor = Colors.orange;
+  static const Color technologyEventColor = Colors.green;
+  static const Color defaultEventColor = Colors.black;
+
+  //  tipos de eventos
+  static const String categoryAll = 'All';
+  static const String categoryMusic = 'Music';
+  static const String categorySport = 'Sport';
+  static const String categoryTechnology = 'Technology';
 
   @override
   void initState() {
     super.initState();
-    eventos = eventServices.fetchEventos(); // Obtener los eventos
-    categories = eventServices.fetchCategories(); // Obtener las categorías
+    eventos = eventServices.fetchEventos();
+    categories = eventServices.fetchCategories();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold( appBar: AppBar(
-      title: Text("Eventos", style: TextStyle(color: Colors.white)), // Título blanco
-      backgroundColor: Color(0xFF1A1A2E), // Color azul oscuro
-      foregroundColor: Colors.white, // Asegura que los íconos del AppBar sean blancos
-    ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Eventos", style: TextStyle(color: Colors.white)),
+        backgroundColor: backgroundColor,
+        foregroundColor: Colors.white,
+      ),
       body: FutureBuilder<List<Evento>>(
         future: eventos,
         builder: (context, snapshot) {
@@ -39,17 +53,14 @@ class _EventosScreenState extends State<EventosScreen> {
             return Center(child: Text("Error al cargar eventos"));
           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             List<Evento> eventos = snapshot.data!;
-            if (selectedCategory != 'All') {
+            if (selectedCategory != categoryAll) {
               eventos = eventos.where((evento) => evento.category == selectedCategory).toList();
             }
             return ListView.builder(
               itemCount: eventos.length,
               itemBuilder: (context, index) {
                 Evento evento = eventos[index];
-
-                // Aquí determinamos el color del borde basado en el tipo o categoría del evento
                 Color borderColor = getBorderColor(evento);
-
                 return EventCard(evento: evento, borderColor: borderColor);
               },
             );
@@ -60,32 +71,30 @@ class _EventosScreenState extends State<EventosScreen> {
       ),
       floatingActionButton: Stack(
         children: [
-          // El botón flotante principal (ícono de filtro)
           Positioned(
             bottom: 20,
-            right: 8,  // Ajuste al lado derecho
+            right: 8,
             child: FloatingActionButton(
               onPressed: () {
                 setState(() {
-                  isFilterVisible = !isFilterVisible; // Alternar la visibilidad de los botones
+                  isFilterVisible = !isFilterVisible;
                 });
               },
-              child: Icon(Icons.filter_list, color: Colors.white), // Ícono blanco
-              backgroundColor: Color(0xFF1A1A2E), // Color azul oscuro
+              child: Icon(Icons.filter_list, color: Colors.white),
+              backgroundColor: backgroundColor,
             ),
           ),
-          // Botones circulares flotantes (solo si están visibles)
           if (isFilterVisible)
             Positioned(
-              bottom: 80, // Ajusta esta distancia para posicionar los botones sobre el FloatingActionButton
-              right: 8,   // Mover más a la derecha
+              bottom: 80,
+              right: 8,
               child: Column(
                 children: [
                   CircleButton(
                     icon: Icons.music_note,
                     onPressed: () {
                       setState(() {
-                        selectedCategory = 'Music';
+                        selectedCategory = categoryMusic;
                       });
                     },
                   ),
@@ -94,7 +103,7 @@ class _EventosScreenState extends State<EventosScreen> {
                     icon: Icons.sports,
                     onPressed: () {
                       setState(() {
-                        selectedCategory = 'Sport';
+                        selectedCategory = categorySport;
                       });
                     },
                   ),
@@ -103,7 +112,16 @@ class _EventosScreenState extends State<EventosScreen> {
                     icon: Icons.computer,
                     onPressed: () {
                       setState(() {
-                        selectedCategory = 'Tech';
+                        selectedCategory = categoryTechnology;
+                      });
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  CircleButton(
+                    icon: Icons.all_inclusive,
+                    onPressed: () {
+                      setState(() {
+                        selectedCategory = categoryAll;
                       });
                     },
                   ),
@@ -115,25 +133,23 @@ class _EventosScreenState extends State<EventosScreen> {
     );
   }
 
-  // Función para obtener el color del borde dependiendo del evento
   Color getBorderColor(Evento evento) {
     switch (evento.category) {
-      case 'Music':
-        return Colors.yellow;
-      case 'Sport':
-        return Colors.orange;
-      case 'Tech':
-        return Colors.green;
+      case categoryMusic:
+        return musicEventColor;
+      case categorySport:
+        return sportEventColor;
+      case categoryTechnology:
+        return technologyEventColor;
       default:
-        return Colors.black;
+        return defaultEventColor;
     }
   }
 
-  // Widget para los botones circulares
   Widget CircleButton({required IconData icon, required VoidCallback onPressed}) {
     return CircleAvatar(
       radius: 30,
-      backgroundColor: Color(0xFF1A1A2E), // Color azul oscuro
+      backgroundColor: backgroundColor,
       child: IconButton(
         icon: Icon(icon, color: Colors.white),
         onPressed: onPressed,
