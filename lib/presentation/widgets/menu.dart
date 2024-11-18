@@ -11,6 +11,12 @@ class Menu extends StatelessWidget {
     return role == 'a';
   }
 
+  Future<bool> _isUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? role = prefs.getString('role');
+    return role == 'u';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -41,6 +47,18 @@ class Menu extends StatelessWidget {
               _buildMenuItem(context, Icons.event, 'Eventos', AppRoutes.eventos), // Nueva opción para Eventos
               if (snapshot.data == true)
                 _buildMenuItem(context, Icons.admin_panel_settings, 'Panel de Administrador', AppRoutes.adminPanel),
+              FutureBuilder<bool>(
+                future: _isUser(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox.shrink();
+                  }
+                  if (snapshot.data == true) {
+                    return _buildMenuItem(context, Icons.report, 'Informe', AppRoutes.report);
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
               _buildMenuItem(context, Icons.logout, 'Logout', AppRoutes.login),
             ],
           );

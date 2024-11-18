@@ -3,6 +3,7 @@ import 'package:eventify_flutter/presentation/screens/login/login_screen.dart';
 import 'package:eventify_flutter/presentation/screens/login/register_screen.dart';
 import 'package:eventify_flutter/presentation/screens/users/admin_user_screen.dart';
 import 'package:eventify_flutter/presentation/screens/users/user_home_screen.dart';
+import 'package:eventify_flutter/presentation/screens/report/report_screen.dart';
 import 'package:eventify_flutter/providers/user_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/admin': (context) => const UserListScreen(),
         '/home': (context) => const UserHomeScreen(),
         '/eventos': (context) => EventosScreen(),
+        '/report': (context) => ReportScreen(), // Nueva ruta para la pantalla de Informe
       },
     );
   }
