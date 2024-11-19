@@ -1,7 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart' as path_provider;
@@ -9,6 +8,7 @@ import 'dart:io';
 import '../../../providers/event_service.dart';
 import '../../../models/event.dart';
 import '../../../models/category.dart';
+import 'package:flutter/services.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -59,6 +59,18 @@ class _ReportScreenState extends State<ReportScreen> {
         }
       });
     }
+  }
+
+  Future<String> _getDownloadDirectory() async {
+    Directory? directory;
+    if (Platform.isAndroid) {
+      directory = Directory('/storage/emulated/0/Download');
+    } else if (Platform.isIOS) {
+      directory = await path_provider.getApplicationDocumentsDirectory();
+    } else {
+      directory = await path_provider.getDownloadsDirectory();
+    }
+    return directory?.path ?? '';
   }
 
   Future<void> _generatePDF() async {
@@ -116,12 +128,8 @@ class _ReportScreenState extends State<ReportScreen> {
       pdf.addPage(pw.Page(build: (pw.Context context) => pw.Column(children: eventWidgets)));
 
       // Save PDF to Download directory
-      final directory = await path_provider.getExternalStorageDirectory();
-      final downloadDir = Directory('${directory!.path}/Download');
-      if (!await downloadDir.exists()) {
-        await downloadDir.create(recursive: true);
-      }
-      final file = File('${downloadDir.path}/report.pdf');
+      final directory = await _getDownloadDirectory();
+      final file = File('$directory/report.pdf');
       await file.writeAsBytes(await pdf.save());
 
       ScaffoldMessenger.of(context).showSnackBar(
