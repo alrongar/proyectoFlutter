@@ -1,13 +1,16 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'dart:io';
 import '../../../providers/event_service.dart';
 import '../../../models/event.dart';
 
 class ReportScreen extends StatefulWidget {
+  const ReportScreen({super.key});
+
   @override
   _ReportScreenState createState() => _ReportScreenState();
 }
@@ -16,7 +19,7 @@ class _ReportScreenState extends State<ReportScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   DateTime? _startDate;
   DateTime? _endDate;
-  List<String> _selectedCategories = [];
+  final List<String> _selectedCategories = [];
   final List<String> _categories = ['Music', 'Sport', 'Technology'];
 
   Future<void> _selectDate(BuildContext context, bool isStart) async {
@@ -70,10 +73,11 @@ class _ReportScreenState extends State<ReportScreen> {
       );
 
       // Save PDF to internal storage
-      final directory = await getApplicationDocumentsDirectory();
+      final directory = await path_provider.getApplicationDocumentsDirectory();
       final file = File('${directory.path}/report.pdf');
       await file.writeAsBytes(await pdf.save());
 
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('PDF generado y guardado en ${file.path}')),
       );
@@ -84,7 +88,7 @@ class _ReportScreenState extends State<ReportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Informe'),
+        title: const Text('Informe'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -94,12 +98,12 @@ class _ReportScreenState extends State<ReportScreen> {
             children: [
               ListTile(
                 title: Text('Fecha de inicio: ${_startDate != null ? DateFormat('dd/MM/yyyy').format(_startDate!) : 'No seleccionada'}'),
-                trailing: Icon(Icons.calendar_today),
+                trailing: const Icon(Icons.calendar_today),
                 onTap: () => _selectDate(context, true),
               ),
               ListTile(
                 title: Text('Fecha final: ${_endDate != null ? DateFormat('dd/MM/yyyy').format(_endDate!) : 'No seleccionada'}'),
-                trailing: Icon(Icons.calendar_today),
+                trailing: const Icon(Icons.calendar_today),
                 onTap: () => _selectDate(context, false),
               ),
               ..._categories.map((category) {
@@ -116,11 +120,11 @@ class _ReportScreenState extends State<ReportScreen> {
                     });
                   },
                 );
-              }).toList(),
-              SizedBox(height: 20),
+              }),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _generatePDF,
-                child: Text('Generar PDF'),
+                child: const Text('Generar PDF'),
               ),
             ],
           ),
