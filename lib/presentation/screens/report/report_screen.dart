@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart' as path_provider;
@@ -73,12 +74,13 @@ class _ReportScreenState extends State<ReportScreen> {
     return directory?.path ?? '';
   }
 
-  Future<void> _generatePDF() async {
+  Future<File?> _generatePDF() async {
     if (_startDate == null || _endDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, seleccione las fechas de inicio y fin')),
+        const SnackBar(
+            content: Text('Por favor, seleccione las fechas de inicio y fin')),
       );
-      return;
+      return null;
     }
 
     if (_formKey.currentState?.validate() ?? false) {
@@ -101,9 +103,11 @@ class _ReportScreenState extends State<ReportScreen> {
       // Verificar si hay eventos
       if (events.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No hay eventos que cumplan con los criterios seleccionados')),
+          const SnackBar(
+              content: Text(
+                  'No hay eventos que cumplan con los criterios seleccionados')),
         );
-        return;
+        return null;
       }
 
       // Generate PDF
@@ -111,29 +115,68 @@ class _ReportScreenState extends State<ReportScreen> {
       final List<pw.Widget> eventWidgets = [];
       for (var event in events) {
         final image = pw.MemoryImage(
-          (await NetworkAssetBundle(Uri.parse(event.imageUrl)).load(event.imageUrl)).buffer.asUint8List(),
+          (await NetworkAssetBundle(Uri.parse(event.imageUrl))
+                  .load(event.imageUrl))
+              .buffer
+              .asUint8List(),
         );
         eventWidgets.add(
           pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Image(image, width: 100, height: 100),
-              pw.Text(event.title, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-              pw.Text('${DateFormat('dd/MM/yyyy').format(event.startTime)} - ${DateFormat('dd/MM/yyyy').format(event.startTime)}'),
+              pw.Text(event.title,
+                  style: pw.TextStyle(
+                      fontSize: 18, fontWeight: pw.FontWeight.bold)),
+              pw.Text(
+                  '${DateFormat('dd/MM/yyyy').format(event.startTime)} - ${DateFormat('dd/MM/yyyy').format(event.startTime)}'),
               pw.SizedBox(height: 10),
             ],
           ),
         );
       }
-      pdf.addPage(pw.Page(build: (pw.Context context) => pw.Column(children: eventWidgets)));
+      pdf.addPage(pw.Page(
+          build: (pw.Context context) => pw.Column(children: eventWidgets)));
 
       // Save PDF to Download directory
       final directory = await _getDownloadDirectory();
       final file = File('$directory/report.pdf');
       await file.writeAsBytes(await pdf.save());
 
+      if (await file.exists()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Pdf generado correctamente en ${file.path}')),
+        );
+        return file; // Devuelve el archivo si todo fue bien
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al generar el pdf')),
+        );
+        return null;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _sendEmailWithAttachment(File pdfFile) async {
+    String email =
+        'alejandroroncerogarrido@gmail.com'; //cambiar a email de usuario activo
+    final emailToSend = Email(
+      body: 'Por favor, encuentra adjunto el listado de eventos.',
+      subject: 'Listado de eventos',
+      recipients: [email],
+      attachmentPaths: [pdfFile.path], // Adjunta el archivo
+      isHTML: false,
+    );
+
+    try {
+      await FlutterEmailSender.send(emailToSend);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('PDF generado y guardado en ${file.path}')),
+        const SnackBar(content: Text('Correo enviado exitosamente.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al enviar el correo.')),
       );
     }
   }
@@ -141,7 +184,6 @@ class _ReportScreenState extends State<ReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -149,12 +191,14 @@ class _ReportScreenState extends State<ReportScreen> {
           child: Column(
             children: [
               ListTile(
-                title: Text('Fecha de inicio: ${_startDate != null ? DateFormat('dd/MM/yyyy').format(_startDate!) : 'No seleccionada'}'),
+                title: Text(
+                    'Fecha de inicio: ${_startDate != null ? DateFormat('dd/MM/yyyy').format(_startDate!) : 'No seleccionada'}'),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () => _selectDate(context, true),
               ),
               ListTile(
-                title: Text('Fecha final: ${_endDate != null ? DateFormat('dd/MM/yyyy').format(_endDate!) : 'No seleccionada'}'),
+                title: Text(
+                    'Fecha final: ${_endDate != null ? DateFormat('dd/MM/yyyy').format(_endDate!) : 'No seleccionada'}'),
                 trailing: const Icon(Icons.calendar_today),
                 onTap: () => _selectDate(context, false),
               ),
@@ -174,9 +218,19 @@ class _ReportScreenState extends State<ReportScreen> {
                 );
               }).toList(),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _generatePDF,
-                child: const Text('Generar PDF'),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: _generatePDF,
+                    child: const Text('Generar PDF'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      _sendEmailWithAttachment(_generatePDF() as File);
+                    },
+                    child: const Text('Enviar PDF por email'),
+                  ),
+                ],
               ),
             ],
           ),
