@@ -1,10 +1,13 @@
+import 'package:eventify_flutter/presentation/screens/events/info_event_screen.dart';
 import 'package:flutter/material.dart';
-import '../../../providers/event_service.dart';
 import '../../../models/event.dart';
 import '../../../models/category.dart';
-import '../../widgets/cardevents/event_card.dart';
+import '../../../providers/event_service.dart';
+import 'package:eventify_flutter/presentation/widgets/cardevents/event_card.dart';
 
 class EventosScreen extends StatefulWidget {
+  const EventosScreen({super.key});
+
   @override
   _EventosScreenState createState() => _EventosScreenState();
 }
@@ -16,14 +19,12 @@ class _EventosScreenState extends State<EventosScreen> {
   String selectedCategory = 'All';
   bool isFilterVisible = false;
 
-  // colores
   static const Color backgroundColor = Color(0xFF1A1A2E);
   static const Color musicEventColor = Colors.yellow;
   static const Color sportEventColor = Colors.orange;
   static const Color technologyEventColor = Colors.green;
   static const Color defaultEventColor = Colors.black;
 
-  //  tipos de eventos
   static const String categoryAll = 'All';
   static const String categoryMusic = 'Music';
   static const String categorySport = 'Sport';
@@ -38,98 +39,94 @@ class _EventosScreenState extends State<EventosScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Eventos", style: TextStyle(color: Colors.white)),
-        backgroundColor: backgroundColor,
-        foregroundColor: Colors.white,
-      ),
-      body: FutureBuilder<List<Evento>>(
-        future: eventos,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error al cargar eventos"));
-          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            List<Evento> eventos = snapshot.data!;
-            if (selectedCategory != categoryAll) {
-              eventos = eventos.where((evento) => evento.category == selectedCategory).toList();
+    return Stack(
+      children: [
+        FutureBuilder<List<Evento>>(
+          future: eventos,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return const Center(child: Text("Error al cargar eventos"));
+            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+              List<Evento> eventos = snapshot.data!;
+              if (selectedCategory != categoryAll) {
+                eventos = eventos.where((evento) => evento.category == selectedCategory).toList();
+              }
+              return ListView.builder(
+                itemCount: eventos.length,
+                itemBuilder: (context, index) {
+                  Evento evento = eventos[index];
+                  Color borderColor = getBorderColor(evento);
+                  return GestureDetector(
+                    onTap: () => _showEventDetails(context, evento),
+                    child: EventCard(evento: evento, borderColor: borderColor),
+                  );
+                },
+              );
+            } else {
+              return const Center(child: Text("No se encontraron eventos"));
             }
-            return ListView.builder(
-              itemCount: eventos.length,
-              itemBuilder: (context, index) {
-                Evento evento = eventos[index];
-                Color borderColor = getBorderColor(evento);
-                return EventCard(evento: evento, borderColor: borderColor);
-              },
-            );
-          } else {
-            return Center(child: Text("No se encontraron eventos"));
-          }
-        },
-      ),
-      floatingActionButton: Stack(
-        children: [
+          },
+        ),
+        if (isFilterVisible)
           Positioned(
-            bottom: 20,
+            bottom: 80,
             right: 8,
-            child: FloatingActionButton(
-              onPressed: () {
-                setState(() {
-                  isFilterVisible = !isFilterVisible;
-                });
-              },
-              child: Icon(Icons.filter_list, color: Colors.white),
-              backgroundColor: backgroundColor,
+            child: Column(
+              children: [
+                CircleButton(
+                  icon: Icons.music_note,
+                  onPressed: () {
+                    setState(() {
+                      selectedCategory = categoryMusic;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                CircleButton(
+                  icon: Icons.sports,
+                  onPressed: () {
+                    setState(() {
+                      selectedCategory = categorySport;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                CircleButton(
+                  icon: Icons.computer,
+                  onPressed: () {
+                    setState(() {
+                      selectedCategory = categoryTechnology;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                CircleButton(
+                  icon: Icons.all_inclusive,
+                  onPressed: () {
+                    setState(() {
+                      selectedCategory = categoryAll;
+                    });
+                  },
+                ),
+              ],
             ),
           ),
-          if (isFilterVisible)
-            Positioned(
-              bottom: 80,
-              right: 8,
-              child: Column(
-                children: [
-                  CircleButton(
-                    icon: Icons.music_note,
-                    onPressed: () {
-                      setState(() {
-                        selectedCategory = categoryMusic;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 16),
-                  CircleButton(
-                    icon: Icons.sports,
-                    onPressed: () {
-                      setState(() {
-                        selectedCategory = categorySport;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 16),
-                  CircleButton(
-                    icon: Icons.computer,
-                    onPressed: () {
-                      setState(() {
-                        selectedCategory = categoryTechnology;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 16),
-                  CircleButton(
-                    icon: Icons.all_inclusive,
-                    onPressed: () {
-                      setState(() {
-                        selectedCategory = categoryAll;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
+        Positioned(
+          bottom: 20,
+          right: 8,
+          child: FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                isFilterVisible = !isFilterVisible;
+              });
+            },
+            child: const Icon(Icons.filter_list, color: Colors.white),
+            backgroundColor: backgroundColor,
+          ),
+        ),
+      ],
     );
   }
 
@@ -144,6 +141,59 @@ class _EventosScreenState extends State<EventosScreen> {
       default:
         return defaultEventColor;
     }
+  }
+
+  void _showEventDetails(BuildContext context, Evento evento) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (BuildContext context) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Center(
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                width: 350,
+                height: 550,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 2,
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    EventDetails(evento: evento),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: Colors.black),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget CircleButton({required IconData icon, required VoidCallback onPressed}) {

@@ -2,10 +2,9 @@ import 'package:eventify_flutter/presentation/screens/events/event_screen.dart';
 import 'package:eventify_flutter/presentation/screens/login/login_screen.dart';
 import 'package:eventify_flutter/presentation/screens/login/register_screen.dart';
 import 'package:eventify_flutter/presentation/screens/users/admin_user_screen.dart';
-import 'package:eventify_flutter/presentation/screens/users/user_home_screen.dart';
 import 'package:eventify_flutter/presentation/screens/report/report_screen.dart';
+import 'package:eventify_flutter/presentation/widgets/base_screen.dart'; // Importamos BaseScreen
 import 'package:eventify_flutter/providers/user_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'config/theme/app_theme.dart';
@@ -30,14 +29,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Eventify',
       theme: AppTheme(selectedColor: 1).theme(),
-      initialRoute: '/login',
+      initialRoute: '/login', // Comenzamos desde Login
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/admin': (context) => const UserListScreen(),
-        '/home': (context) => const UserHomeScreen(),
+        '/home': (context) => const BaseScreen(),
         '/eventos': (context) => EventosScreen(),
-        '/report': (context) => ReportScreen(), // Nueva ruta para la pantalla de Informe
+        '/report': (context) => ReportScreen(),
       },
     );
   }

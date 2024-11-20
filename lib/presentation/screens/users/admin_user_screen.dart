@@ -11,12 +11,12 @@ class UserListScreen extends StatefulWidget {
 }
 
 class UserListScreenState extends State<UserListScreen> {
-  List<dynamic> users = []; // Lista para almacenar los usuarios
+  List<dynamic> users = [];
 
   @override
   void initState() {
     super.initState();
-    fetchUsers(); // Llamada inicial para obtener los usuarios
+    fetchUsers();
   }
 
   Future<void> fetchUsers() async {
@@ -31,30 +31,17 @@ class UserListScreenState extends State<UserListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Administración de Usuarios'),
-        iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: const Color(0xFF1A1A2E), // Azul oscuro
-        centerTitle: true,
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      body: users.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : Container(
-        color: const Color(0xFF0F3460), // Fondo de la pantalla oscuro (contraste)
-        child: ListView.builder(
-          padding: const EdgeInsets.all(16.0),
-          itemCount: users.length,
-          itemBuilder: (context, index) {
-            var user = users[index];
-            return _buildUserCard(user);
-          },
-        ),
+    return users.isEmpty
+        ? const Center(child: CircularProgressIndicator())
+        : Container(
+      color: const Color(0xFF0F3460),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16.0),
+        itemCount: users.length,
+        itemBuilder: (context, index) {
+          var user = users[index];
+          return _buildUserCard(user);
+        },
       ),
     );
   }
@@ -104,7 +91,7 @@ class UserListScreenState extends State<UserListScreen> {
                   const SizedBox(width: 10),
                   _buildActionButton(
                     icon: isActive ? Icons.check : Icons.block,
-                    color: isActive ? Colors.green : Colors.yellow, // Verde para activar, Amarillo para desactivar
+                    color: isActive ? Colors.green : Colors.yellow,
                     onPressed: () async {
                       if (isActive) {
                         await UserService.deactivateUser(id.toString());
@@ -116,7 +103,7 @@ class UserListScreenState extends State<UserListScreen> {
                   ),
                   _buildActionButton(
                     icon: Icons.edit,
-                    color: const Color(0xFFFFA500)  ,
+                    color: const Color(0xFFFFA500),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -130,7 +117,7 @@ class UserListScreenState extends State<UserListScreen> {
                   ),
                   _buildActionButton(
                     icon: Icons.delete,
-                    color: Colors.red, // Rojo para eliminar
+                    color: Colors.red,
                     onPressed: () async {
                       bool confirmed = await _showDeleteConfirmationDialog();
                       if (confirmed) {
@@ -152,15 +139,15 @@ class UserListScreenState extends State<UserListScreen> {
               offset: Offset(offsetX, 0),
               child: Card(
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
-                color: Colors.white, // Color blanco para las tarjetas
+                color: Colors.white,
                 child: ListTile(
-                  leading: const Icon(Icons.person, size: 40, color: Color(0xFF0F3460)), // Azul medianoche
+                  leading: const Icon(Icons.person, size: 40, color: Color(0xFF0F3460)),
                   title: Text(
                     '$name ($role)',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black, // Letra en negro
+                      color: Colors.black,
                     ),
                   ),
                 ),

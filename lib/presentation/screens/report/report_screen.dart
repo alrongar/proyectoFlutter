@@ -141,9 +141,7 @@ class _ReportScreenState extends State<ReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Informe'),
-      ),
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

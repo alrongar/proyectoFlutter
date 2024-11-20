@@ -7,7 +7,6 @@ import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart'
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 import '../../../config/rutes/app_routes.dart'; // Importar las rutas
 
 class LoginScreen extends StatefulWidget {
@@ -42,10 +41,12 @@ class LoginScreenState extends State<LoginScreen> {
       final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         final token = data['data']['token'];
+        final userId = data['data']['id']; // Suponiendo que el id del usuario está aquí
         final role = data['data']['role'];
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
+        await prefs.setString('user_id', userId.toString()); // Guardar el id del usuario
         await prefs.setString('role', role);
 
         if (!mounted) return;

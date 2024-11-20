@@ -59,7 +59,7 @@ class EventCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  // Botón de acción (Ejemplo: Comprar entrada)
+                 
                 ],
               ),
             ),
