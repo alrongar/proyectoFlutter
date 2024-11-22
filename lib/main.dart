@@ -34,9 +34,17 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/admin': (context) => const UserListScreen(),
-        '/home': (context) => const BaseScreen(),
+       
+        '/home': (context,){
+          final email = ModalRoute.of(context)?.settings.arguments as String?;
+          
+          return BaseScreen(email: email ?? ''); 
+        },
         '/eventos': (context) => EventosScreen(),
-        '/report': (context) => ReportScreen(),
+        '/report': (context){
+          final email = ModalRoute.of(context)?.settings.arguments as String?;
+          return ReportScreen(email: email ?? ''); 
+        },
       },
     );
   }

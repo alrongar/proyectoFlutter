@@ -44,7 +44,8 @@ class EmailService {
 }
 
 class ReportScreen extends StatefulWidget {
-  const ReportScreen({super.key});
+  final String email;
+  const ReportScreen({super.key, required this.email});
 
   @override
   _ReportScreenState createState() => _ReportScreenState();
@@ -56,6 +57,8 @@ class _ReportScreenState extends State<ReportScreen> {
   DateTime? _endDate;
   final List<String> _selectedCategories = [];
   List<Category> _categories = [];
+  
+  get email => null;
 
   @override
   void initState() {
@@ -196,9 +199,8 @@ class _ReportScreenState extends State<ReportScreen> {
     final emailService = EmailService();
     final file = File(pdfFilePath);
     final fileBytes = await file.readAsBytes();
-
     await emailService.sendEmail(
-      toEmail: 'destinatario@correo.com',  // Dirección de correo del destinatario
+      toEmail: email,  // Dirección de correo del destinatario
       subject: 'Informe de eventos',
       body: 'Adjunto el informe generado en formato PDF.',
       attachmentBytes: fileBytes,
@@ -208,6 +210,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final email = ModalRoute.of(context)?.settings.arguments as String?;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Generar Reporte'),
@@ -263,6 +266,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     );
                     return;
                   }
+                      print(email);
 
                   if (_formKey.currentState?.validate() ?? false) {
                     _formKey.currentState?.save();

@@ -6,7 +6,8 @@ import '../screens/report/report_screen.dart';
 import '../screens/users/user_home_screen.dart';
 
 class BaseScreen extends StatefulWidget {
-  const BaseScreen({super.key});
+  final String email;
+  const BaseScreen({super.key, required this.email});
 
   @override
   State<BaseScreen> createState() => _BaseScreenState();
@@ -54,7 +55,11 @@ class _BaseScreenState extends State<BaseScreen> {
     }
 
     if (_isUser) {
-      pages.add(const ReportScreen()); // Pantalla de informes
+      final email = ModalRoute.of(context)?.settings.arguments as String?;
+      if (email!.isNotEmpty) {
+        pages.add(ReportScreen(email: email)); // Pantalla de informes
+      }
+      
     }
 
     return pages;
@@ -110,6 +115,8 @@ class _BaseScreenState extends State<BaseScreen> {
 
     return items;
   }
+  
+  
 
   void _onItemTapped(int index) {
     if (index == _menuItems.length - 1) {
@@ -131,6 +138,7 @@ class _BaseScreenState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final email = ModalRoute.of(context)?.settings.arguments as String?;
     return Scaffold(
       appBar: AppBar(
         title: Text(_titles[_currentIndex]),

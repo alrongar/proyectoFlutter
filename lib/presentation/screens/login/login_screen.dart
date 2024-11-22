@@ -50,7 +50,8 @@ class LoginScreenState extends State<LoginScreen> {
         await prefs.setString('role', role);
 
         if (!mounted) return;
-        Navigator.pushNamed(context, AppRoutes.home);
+        
+        Navigator.pushNamed(context, AppRoutes.home, arguments: email);
       } else {
         var errorMessage = UserService.getTranslatedMessage(data);
         if (errorMessage == 'Error desconocido') {
