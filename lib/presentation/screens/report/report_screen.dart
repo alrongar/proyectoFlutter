@@ -252,12 +252,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     onPressed: _generatePDF,
                     child: const Text('Generar PDF'),
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      _sendEmail(_generatePDF() as String);
-                    },
-                    child: const Text('Enviar PDF por email'),
-                  ),
+                  
                 ],
               ),
               ElevatedButton(
