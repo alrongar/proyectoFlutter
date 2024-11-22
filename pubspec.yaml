@@ -39,10 +39,7 @@ dependencies:
   pdf: ^3.11.1
   intl: ^0.19.0
   flutter_email_sender: ^5.0.0
-<<<<<<< HEAD
   mailer: ^6.0.0
-=======
->>>>>>> 3d524c73e0cc1a586aa0a2a5d9dd7ccf3507f516
 dev_dependencies:
 
   # The "flutter_lints" package below contains a set of recommended lints to

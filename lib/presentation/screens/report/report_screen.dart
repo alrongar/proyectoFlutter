@@ -190,31 +190,7 @@ class _ReportScreenState extends State<ReportScreen> {
     return null;
   }
 
-  Future<void> _sendEmailWithAttachment(File pdfFile) async {
-    String email =
-        'alejandroroncerogarrido@gmail.com'; //cambiar a email de usuario activo
-    final emailToSend = Email(
-      body: 'Por favor, encuentra adjunto el listado de eventos.',
-      subject: 'Listado de eventos',
-      recipients: [email],
-      attachmentPaths: [pdfFile.path], // Adjunta el archivo
-      isHTML: false,
-    );
-
-    try {
-      await FlutterEmailSender.send(emailToSend);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Correo enviado exitosamente.')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al enviar el correo.')),
-      );
-
-      // Enviar el PDF por correo
-      await _sendEmail(file.path);
-    }
-  }
+  
 
   Future<void> _sendEmail(String pdfFilePath) async {
     final emailService = EmailService();
@@ -233,12 +209,9 @@ class _ReportScreenState extends State<ReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-<<<<<<< HEAD
       appBar: AppBar(
         title: const Text('Generar Reporte'),
       ),
-=======
->>>>>>> 3d524c73e0cc1a586aa0a2a5d9dd7ccf3507f516
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -281,7 +254,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      _sendEmailWithAttachment(_generatePDF() as File);
+                      _sendEmail(_generatePDF() as String);
                     },
                     child: const Text('Enviar PDF por email'),
                   ),
