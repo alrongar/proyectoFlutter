@@ -1,3 +1,4 @@
+import 'package:eventify_flutter/providers/event_service.dart';
 import 'package:flutter/material.dart';
 import '../../../models/event.dart';
 
@@ -8,6 +9,8 @@ class EventDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    EventServices eventServices = new EventServices();
+
     return Center(
       child: Container(
         padding: const EdgeInsets.all(16.0),
@@ -75,10 +78,19 @@ class EventDetails extends StatelessWidget {
             // Botón para apuntarse al evento
             ElevatedButton(
               onPressed: () {
-                // Lógica para apuntarse al evento
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('¡Te has apuntado al evento!')),
-                );
+                try {
+                  eventServices.registerEvent(evento);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('¡Te has apuntado al evento!')),
+                  );
+                } catch (error) {
+                  print('Error al registrar el evento: $error');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content:
+                            Text('Hubo un problema al registrarte al evento.')),
+                  );
+                }
               },
               child: Text(
                 'Apuntarse',

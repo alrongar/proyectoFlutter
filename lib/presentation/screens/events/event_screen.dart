@@ -33,7 +33,8 @@ class _EventosScreenState extends State<EventosScreen> {
   @override
   void initState() {
     super.initState();
-    eventos = eventServices.fetchEventos();
+    eventos = EventServices().loadEvents();
+    
     categories = eventServices.fetchCategories();
   }
 
