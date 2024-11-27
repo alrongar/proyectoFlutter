@@ -22,7 +22,7 @@ class EventCard extends StatelessWidget {
             // Imagen de fondo
             Positioned.fill(
               child: Image.network(
-                evento.imageUrl,
+                '${evento.imageUrl}',
                 fit: BoxFit.cover,
               ),
             ),

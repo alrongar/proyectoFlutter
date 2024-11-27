@@ -148,8 +148,8 @@ class _ReportScreenState extends State<ReportScreen> {
       final List<pw.Widget> eventWidgets = [];
       for (var event in events) {
         final image = pw.MemoryImage(
-          (await NetworkAssetBundle(Uri.parse(event.imageUrl))
-                  .load(event.imageUrl))
+          (await NetworkAssetBundle(Uri.parse('${event.imageUrl}'))
+                  .load('${event.imageUrl}'))
               .buffer
               .asUint8List(),
         );
@@ -296,7 +296,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     final List<pw.Widget> eventWidgets = [];
                     for (var event in events) {
                       final image = pw.MemoryImage(
-                        (await NetworkAssetBundle(Uri.parse(event.imageUrl)).load(event.imageUrl)).buffer.asUint8List(),
+                        (await NetworkAssetBundle(Uri.parse('${event.imageUrl}')).load('${event.imageUrl}')).buffer.asUint8List(),
                       );
                       eventWidgets.add(
                         pw.Container(

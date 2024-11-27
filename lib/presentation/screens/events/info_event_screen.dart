@@ -2,15 +2,30 @@ import 'package:eventify_flutter/providers/event_service.dart';
 import 'package:flutter/material.dart';
 import '../../../models/event.dart';
 
-class EventDetails extends StatelessWidget {
+class EventDetails extends StatefulWidget {
   final Evento evento;
 
-  EventDetails({required this.evento});
+  EventDetails(BuildContext context, {super.key, required this.evento});
 
+  @override
+  State<EventDetails> createState() => _EventDetailsState();
+}
+
+class _EventDetailsState extends State<EventDetails> {
+  
+  var btnText = '';
+
+@override
+  void initState() {
+    super.initState();
+
+    btnText = widget.evento.category == '' ? "Borrarse" : "Apuntarse";
+  }
+ 
   @override
   Widget build(BuildContext context) {
     EventServices eventServices = new EventServices();
-
+    
     return Center(
       child: Container(
         padding: const EdgeInsets.all(16.0),
@@ -23,7 +38,7 @@ class EventDetails extends StatelessWidget {
               color: Colors.grey.withOpacity(0.2),
               spreadRadius: 2,
               blurRadius: 8,
-              offset: Offset(0, 4), // Cambiar la posición de la sombra
+              offset: const Offset(0, 4), // Cambiar la posición de la sombra
             ),
           ],
         ),
@@ -33,8 +48,8 @@ class EventDetails extends StatelessWidget {
           children: [
             // Título del evento
             Text(
-              evento.title,
-              style: TextStyle(
+              widget.evento.title,
+              style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: Colors.blueAccent,
@@ -46,7 +61,7 @@ class EventDetails extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
               child: Image.network(
-                evento.imageUrl,
+                '${widget.evento.imageUrl}',
                 height: 200,
                 width: 200,
                 fit: BoxFit.cover,
@@ -54,7 +69,7 @@ class EventDetails extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             // Descripción del evento
-            Text(
+            const Text(
               'Descripción: Aquí iría la descripción completa del evento.',
               style: TextStyle(
                 fontSize: 16,
@@ -66,8 +81,8 @@ class EventDetails extends StatelessWidget {
             const SizedBox(height: 12),
             // Fecha del evento
             Text(
-              'Fecha: ${evento.startTime}',
-              style: TextStyle(
+              'Fecha: ${widget.evento.startTime}',
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.black87,
                 fontWeight: FontWeight.w500,
@@ -78,33 +93,51 @@ class EventDetails extends StatelessWidget {
             // Botón para apuntarse al evento
             ElevatedButton(
               onPressed: () {
-                try {
-                  eventServices.registerEvent(evento);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('¡Te has apuntado al evento!')),
-                  );
-                } catch (error) {
-                  print('Error al registrar el evento: $error');
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content:
-                            Text('Hubo un problema al registrarte al evento.')),
-                  );
+                if (widget.evento.category == '') {
+
+                  try {
+                    eventServices.unregisterEvent(widget.evento);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('¡Te has borrado del evento!')),
+                    );
+                  } catch (error) {
+                    print('Error al borrar del evento: $error');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text(
+                              'Hubo un problema al borrarse del evento.')),
+                    );
+                  }
+                } else {
+
+                  try {
+                    eventServices.registerEvent(widget.evento);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('¡Te has apuntado al evento!')),
+                    );
+                  } catch (error) {
+                    print('Error al registrar el evento: $error');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text(
+                              'Hubo un problema al registrarte al evento.')),
+                    );
+                  }
                 }
               },
-              child: Text(
-                'Apuntarse',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 backgroundColor: Colors.blueAccent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: Text(
+                btnText,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),

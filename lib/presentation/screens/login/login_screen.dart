@@ -18,8 +18,10 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final GlobalKey<CustomTextFieldState> emailKey = GlobalKey<CustomTextFieldState>();
-  final GlobalKey<CustomTextFieldState> passwordKey = GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> emailKey =
+      GlobalKey<CustomTextFieldState>();
+  final GlobalKey<CustomTextFieldState> passwordKey =
+      GlobalKey<CustomTextFieldState>();
 
   Future<void> login() async {
     final email = emailKey.currentState?.textValue ?? '';
@@ -29,43 +31,51 @@ class LoginScreenState extends State<LoginScreen> {
         const SnackBar(content: Text('Por favor, complete todos los campos')),
       );
       return;
-    }
+    } else {
+      try {
+        final response = await http.post(
+          Uri.parse('https://eventify.allsites.es/public/api/login'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: jsonEncode({'email': email, 'password': password}),
+        );
 
-    try {
-      final response = await http.post(
-        Uri.parse('https://eventify.allsites.es/public/api/login'),
-        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
-      );
+        final data = jsonDecode(response.body);
+        if (response.statusCode == 200) {
+          final token = data['data']['token'];
+          final userId =
+              data['data']['id']; // Suponiendo que el id del usuario está aquí
+          final role = data['data']['role'];
 
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        final token = data['data']['token'];
-        final userId = data['data']['id']; // Suponiendo que el id del usuario está aquí
-        final role = data['data']['role'];
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('auth_token', token);
+          await prefs.setString(
+              'user_id', userId.toString()); // Guardar el id del usuario
+          await prefs.setString('role', role);
+          if (email.isNotEmpty) {
+            await prefs.setString('email', email);
+          }
 
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', token);
-        await prefs.setString('user_id', userId.toString()); // Guardar el id del usuario
-        await prefs.setString('role', role);
+          if (!mounted) return;
 
-        if (!mounted) return;
-        
-        Navigator.pushNamed(context, AppRoutes.home, arguments: email);
-      } else {
-        var errorMessage = UserService.getTranslatedMessage(data);
-        if (errorMessage == 'Error desconocido') {
-          errorMessage = 'Error en el inicio de sesión';
+          Navigator.pushNamed(context, AppRoutes.home, arguments: email);
+        } else {
+          var errorMessage = UserService.getTranslatedMessage(data);
+          if (errorMessage == 'Error desconocido') {
+            errorMessage = 'Error en el inicio de sesión';
+          }
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
         }
-        if (!mounted) return;
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
+          const SnackBar(content: Text('Error en el inicio de sesión')),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error en el inicio de sesión')),
-      );
     }
   }
 
@@ -97,7 +107,8 @@ class LoginScreenState extends State<LoginScreen> {
                       key: emailKey,
                       hintTextContent: 'Correo Electrónico',
                       isRequired: true,
-                      regularExpression: r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                      regularExpression:
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
                     ),
                     const SizedBox(height: 15),
                     CustomTextField(

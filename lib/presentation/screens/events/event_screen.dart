@@ -176,7 +176,7 @@ class _EventosScreenState extends State<EventosScreen> {
                 ),
                 child: Stack(
                   children: [
-                    EventDetails(evento: evento),
+                    EventDetails(evento: evento, context),
                     Positioned(
                       top: 10,
                       right: 10,

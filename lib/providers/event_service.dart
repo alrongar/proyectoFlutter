@@ -11,12 +11,12 @@ class EventServices {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id');
 
-      if (userId == null || token == null) {
+      if (userId == null) {
         throw Exception('Usuario o token no encontrados en preferencias.');
       }
 
       // Obtén los eventos registrados
-      var registeredEvents = await fetchRegisteredEvents(userId, token);
+      var registeredEvents = await fetchRegisteredEvents();
 
       // Obtén todos los eventos
       final allFetchedEvents = await fetchEventos();
@@ -55,7 +55,9 @@ class EventServices {
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         if (jsonResponse['success']) {
+          
           List<dynamic> jsonList = jsonResponse['data'];
+          
           return jsonList.map((json) => Evento.fromJson(json)).toList();
         } else {
           throw Exception(
@@ -137,10 +139,11 @@ class EventServices {
   }
 
   //quitar a un usuario de un evento
-  Future<Map<String, dynamic>> unregisterEvent(
-      String userId, String eventId) async {
+  Future<Map<String, dynamic>> unregisterEvent(Evento evento) async {
     try {
       final token = await _getToken();
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('user_id');
       final response = await http.post(
         Uri.parse('https://eventify.allsites.es/public/api/unregisterEvent'),
         headers: {
@@ -150,7 +153,7 @@ class EventServices {
         },
         body: jsonEncode({
           'user_id': userId,
-          'event_id': eventId,
+          'event_id': evento.id,
         }),
       );
 
@@ -166,25 +169,32 @@ class EventServices {
     }
   }
 
-  Future<List<Evento>> fetchRegisteredEvents(
-      String userId, String token) async {
+  Future<List<Evento>> fetchRegisteredEvents() async {
     try {
       final token = await _getToken();
-      final response = await http.get(
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('user_id');
+      final response = await http.post(
         Uri.parse(
             'https://eventify.allsites.es/public/api/eventsByUser?id=$userId'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
         },
+        
       );
 
+      
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
+        
         if (jsonResponse['success']) {
+          //print(jsonResponse);
           List<dynamic> data = jsonResponse['data'];
+          
           return data.map((json) => Evento.fromJson(json)).toList();
         } else {
+          
           throw Exception(
               'Error al obtener eventos registrados: ${jsonResponse['message']}');
         }

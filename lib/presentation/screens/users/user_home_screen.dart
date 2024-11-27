@@ -1,14 +1,13 @@
 import 'package:eventify_flutter/models/event.dart';
-import 'package:eventify_flutter/presentation/screens/events/event_screen.dart';
+import 'package:eventify_flutter/presentation/screens/events/info_event_screen.dart';
+import 'package:eventify_flutter/presentation/widgets/cardevents/event_card.dart';
 import 'package:eventify_flutter/providers/event_service.dart';
 import 'package:flutter/material.dart';
 
-import 'package:shared_preferences/shared_preferences.dart';
 
 class UserHomeScreen extends StatefulWidget {
-  
   const UserHomeScreen({super.key});
-  
+
   @override
   State<UserHomeScreen> createState() => _UserHomeScreenState();
 }
@@ -17,51 +16,121 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   final EventServices eventServices = EventServices();
   late Future<List<Evento>> registeredEvents;
 
+  static const Color backgroundColor = Color(0xFF1A1A2E);
+  static const Color musicEventColor = Colors.yellow;
+  static const Color sportEventColor = Colors.orange;
+  static const Color technologyEventColor = Colors.green;
+  static const Color defaultEventColor = Colors.black;
+
+  static const String categoryAll = 'All';
+  static const int categoryMusic = 1;
+  static const int categorySport = 2;
+  static const int categoryTechnology = 3;
+
   @override
   void initState() {
     super.initState();
-    registeredEvents = _fetchRegisteredEvents();
-  }
-
-  Future<List<Evento>> _fetchRegisteredEvents() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('user_id');
-    final token = prefs.getString('token');
-
-    if (userId == null || token == null) {
-      return [];
-    }
-
-
-    return eventServices.fetchRegisteredEvents(userId, token);
+    registeredEvents = eventServices.fetchRegisteredEvents();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder<List<Evento>>(
+    
+    return Stack(children: [
+      FutureBuilder<List<Evento>>(
         future: registeredEvents,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return const Center(child: Text('Error al cargar eventos registrados'));
+            return const Center(
+                child: Text('Error al cargar eventos registrados'));
           } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final evento = snapshot.data![index];
-                return ListTile(
-                  title: Text(evento.title),
-                  subtitle: Text('Fecha: ${evento.startTime}'),
-                );
+                Color borderColor = getBorderColor(evento);
+                return GestureDetector(
+                    onTap: () => _showEventDetails(context, evento),
+                    child: EventCard(evento: evento, borderColor: borderColor),
+                  );
               },
             );
           } else {
-            return const Center(child: Text('No estás registrado en ningún evento.'));
+            return const Center(
+                child: Text('No estás registrado en ningún evento.'));
           }
         },
       ),
+    ]);
+  }
+
+  Color getBorderColor(Evento evento) {
+    switch (evento.categoryid) {
+      case categoryMusic:
+        return musicEventColor;
+      case categorySport:
+        return sportEventColor;
+      case categoryTechnology:
+        return technologyEventColor;
+      default:
+        return defaultEventColor;
+    }
+  }
+
+  void _showEventDetails(BuildContext context, Evento evento) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (BuildContext context) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Center(
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                width: 350,
+                height: 550,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 2,
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    EventDetails(evento: evento, context),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: Colors.black),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
+
+
 }
