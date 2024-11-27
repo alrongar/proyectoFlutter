@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'dart:io';
-import 'dart:typed_data';
 import '../../../providers/event_service.dart';
 import '../../../models/event.dart';
 import '../../../models/category.dart';
@@ -22,7 +21,7 @@ class EmailService {
     final smtpServer = gmail('cistianlr@gmail.com', '11022003'); // Usa tu correo y contraseña de aplicación
 
     final message = Message()
-      ..from = Address('cistianlr@gmail.com', 'Cris') // Remitente
+      ..from = const Address('cistianlr@gmail.com', 'Cris') // Remitente
       ..recipients.add(toEmail) // Destinatario
       ..subject = subject
       ..text = body
@@ -155,17 +154,20 @@ class _ReportScreenState extends State<ReportScreen> {
               .asUint8List(),
         );
         eventWidgets.add(
-          pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Image(image, width: 100, height: 100),
-              pw.Text(event.title,
-                  style: pw.TextStyle(
-                      fontSize: 18, fontWeight: pw.FontWeight.bold)),
-              pw.Text(
-                  '${DateFormat('dd/MM/yyyy').format(event.startTime)} - ${DateFormat('dd/MM/yyyy').format(event.startTime)}'),
-              pw.SizedBox(height: 10),
-            ],
+          pw.Container(
+            alignment: pw.Alignment.centerLeft, // Alinea todos los elementos a la izquierda
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Image(image, width: 100, height: 100),
+                pw.Text(event.title,
+                    style: pw.TextStyle(
+                        fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                pw.Text(
+                    '${DateFormat('dd/MM/yyyy').format(event.startTime)} - ${DateFormat('dd/MM/yyyy').format(event.startTime)}'),
+                pw.SizedBox(height: 10),
+              ],
+            ),
           ),
         );
       }
@@ -297,14 +299,17 @@ class _ReportScreenState extends State<ReportScreen> {
                         (await NetworkAssetBundle(Uri.parse(event.imageUrl)).load(event.imageUrl)).buffer.asUint8List(),
                       );
                       eventWidgets.add(
-                        pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.Image(image, width: 100, height: 100),
-                            pw.Text(event.title, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                            pw.Text('${DateFormat('dd/MM/yyyy').format(event.startTime)} - ${DateFormat('dd/MM/yyyy').format(event.startTime)}'),
-                            pw.SizedBox(height: 10),
-                          ],
+                        pw.Container(
+                          alignment: pw.Alignment.centerLeft, // Alinea todos los elementos a la izquierda
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              pw.Image(image, width: 100, height: 100),
+                              pw.Text(event.title, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                              pw.Text('${DateFormat('dd/MM/yyyy').format(event.startTime)} - ${DateFormat('dd/MM/yyyy').format(event.startTime)}'),
+                              pw.SizedBox(height: 10),
+                            ],
+                          ),
                         ),
                       );
                     }
