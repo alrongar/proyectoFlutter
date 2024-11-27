@@ -4,7 +4,6 @@ import 'package:eventify_flutter/presentation/widgets/cardevents/event_card.dart
 import 'package:eventify_flutter/providers/event_service.dart';
 import 'package:flutter/material.dart';
 
-
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
 
@@ -30,12 +29,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   @override
   void initState() {
     super.initState();
+
     registeredEvents = eventServices.fetchRegisteredEvents();
+  }
+
+  void _reloadEvents() {
+    setState(() {
+      registeredEvents = eventServices.fetchRegisteredEvents(); 
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Stack(children: [
       FutureBuilder<List<Evento>>(
         future: registeredEvents,
@@ -52,9 +57,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 final evento = snapshot.data![index];
                 Color borderColor = getBorderColor(evento);
                 return GestureDetector(
-                    onTap: () => _showEventDetails(context, evento),
-                    child: EventCard(evento: evento, borderColor: borderColor),
-                  );
+                  onTap: () => _showEventDetails(context, evento),
+                  child: EventCard(evento: evento, borderColor: borderColor),
+                );
               },
             );
           } else {
@@ -79,8 +84,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
   }
 
-  void _showEventDetails(BuildContext context, Evento evento) {
-    showModalBottomSheet(
+  Future<void> _showEventDetails(BuildContext context, Evento evento) async {
+    final shouldReload = await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -111,7 +116,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 ),
                 child: Stack(
                   children: [
-                    EventDetails(evento: evento, context),
+                    EventDetails(
+                      evento: evento,
+                      context,
+                      onActionCompleted: () {
+                        Navigator.pop(
+                            context, true); // Indica que se debe recargar
+                      },
+                    ),
                     Positioned(
                       top: 10,
                       right: 10,
@@ -130,7 +142,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         );
       },
     );
+
+    if (shouldReload == true) {
+      setState(() {
+        _reloadEvents();
+      });
+    }
   }
-
-
 }

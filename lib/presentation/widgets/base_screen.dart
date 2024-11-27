@@ -22,44 +22,44 @@ class _BaseScreenState extends State<BaseScreen> {
   // Verificamos si el token está disponible
   Future<void> _loadUserRoles() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? authToken = prefs.getString('auth_token'); // Verificar si el token existe
+    String? authToken = prefs.getString('auth_token');
     if (authToken != null) {
       setState(() {
         _isAuthenticated = true;
-        _isAdmin = prefs.getString('role') == 'a'; // Si es admin
-        _isUser = prefs.getString('role') == 'u'; // Si es usuario
+        _isAdmin = prefs.getString('role') == 'a';
+        _isUser = prefs.getString('role') == 'u';
       });
     } else {
       setState(() {
         _isAuthenticated = false;
       });
-      // Si no está autenticado, redirigir al login
-      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      if (context.mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _loadUserRoles(); // Verificar autenticación al cargar
+    _loadUserRoles();
   }
 
   List<Widget> get _pages {
     final pages = [
-      const UserHomeScreen(), // Pantalla principal
-      EventosScreen(),  // Pantalla de eventos
+      const UserHomeScreen(),
+      EventosScreen(),
     ];
 
     if (_isAdmin) {
-      pages.add(const UserListScreen()); // Pantalla admin
+      pages.add(const UserListScreen());
     }
 
     if (_isUser) {
       final email = ModalRoute.of(context)?.settings.arguments as String?;
       if (email!.isNotEmpty) {
-        pages.add(ReportScreen(email: email)); // Pantalla de informes
+        pages.add(ReportScreen(email: email));
       }
-      
     }
 
     return pages;
@@ -115,12 +115,10 @@ class _BaseScreenState extends State<BaseScreen> {
 
     return items;
   }
-  
-  
 
   void _onItemTapped(int index) {
     if (index == _menuItems.length - 1) {
-      _logout(); // Logout
+      _logout();
     } else {
       setState(() {
         _currentIndex = index;
@@ -132,7 +130,8 @@ class _BaseScreenState extends State<BaseScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // Limpiar datos almacenados
     if (context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false); // Redirigir a login
+      Navigator.pushNamedAndRemoveUntil(
+          context, '/login', (route) => false); // Redirigir a login
     }
   }
 
@@ -144,17 +143,33 @@ class _BaseScreenState extends State<BaseScreen> {
         title: Text(_titles[_currentIndex]),
         backgroundColor: const Color(0xFF001D3D),
       ),
-      body: _isAuthenticated ? _pages[_currentIndex] : const Center(child: CircularProgressIndicator()),
+      body: _isAuthenticated
+          ? _pages[_currentIndex]
+          : const Center(child: CircularProgressIndicator()),
       bottomNavigationBar: _isAuthenticated
           ? BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onItemTapped,
-        items: _menuItems,
-        selectedItemColor: const Color(0xFFFFC300),
-        unselectedItemColor: Colors.grey,
-        backgroundColor: const Color(0xFF001D3D),
-      )
+              currentIndex: _currentIndex,
+              onTap: _onItemTapped,
+              items: _menuItems,
+              selectedItemColor: const Color(0xFFFFC300),
+              unselectedItemColor: Colors.grey,
+              backgroundColor: const Color(0xFF001D3D),
+            )
           : null,
     );
+  }
+
+  Future<void> reLoadEvents({required int currentTabIndex}) async {
+    try {
+      setState(() {
+        _currentIndex = currentTabIndex;
+      });
+    } catch (e) {
+      print('Error al recargar eventos: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Hubo un problema al recargar los eventos.')),
+      );
+    }
   }
 }

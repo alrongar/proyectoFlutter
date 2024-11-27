@@ -4,8 +4,9 @@ import '../../../models/event.dart';
 
 class EventDetails extends StatefulWidget {
   final Evento evento;
+  final VoidCallback onActionCompleted;
 
-  EventDetails(BuildContext context, {super.key, required this.evento});
+  EventDetails(BuildContext context, {super.key, required this.evento, required this.onActionCompleted});
 
   @override
   State<EventDetails> createState() => _EventDetailsState();
@@ -69,9 +70,9 @@ class _EventDetailsState extends State<EventDetails> {
             ),
             const SizedBox(height: 12),
             // Descripción del evento
-            const Text(
-              'Descripción: Aquí iría la descripción completa del evento.',
-              style: TextStyle(
+            Text(
+              widget.evento.description,
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.black54,
                 fontStyle: FontStyle.italic,
@@ -94,13 +95,14 @@ class _EventDetailsState extends State<EventDetails> {
             ElevatedButton(
               onPressed: () {
                 if (widget.evento.category == '') {
-
                   try {
                     eventServices.unregisterEvent(widget.evento);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('¡Te has borrado del evento!')),
                     );
+                    widget.onActionCompleted();
                   } catch (error) {
+                    Navigator.pop(context, false);
                     print('Error al borrar del evento: $error');
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -109,13 +111,15 @@ class _EventDetailsState extends State<EventDetails> {
                     );
                   }
                 } else {
-
+                  
                   try {
                     eventServices.registerEvent(widget.evento);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('¡Te has apuntado al evento!')),
                     );
+                    widget.onActionCompleted();
                   } catch (error) {
+                    Navigator.pop(context, false);
                     print('Error al registrar el evento: $error');
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -124,6 +128,7 @@ class _EventDetailsState extends State<EventDetails> {
                     );
                   }
                 }
+                
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),

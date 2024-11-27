@@ -38,6 +38,12 @@ class _EventosScreenState extends State<EventosScreen> {
     categories = eventServices.fetchCategories();
   }
 
+  void _reloadEvents() {
+    setState(() {
+      eventos = eventServices.loadEvents();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -144,8 +150,8 @@ class _EventosScreenState extends State<EventosScreen> {
     }
   }
 
-  void _showEventDetails(BuildContext context, Evento evento) {
-    showModalBottomSheet(
+  Future<void> _showEventDetails(BuildContext context, Evento evento) async {
+    final shouldReload = await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -176,7 +182,10 @@ class _EventosScreenState extends State<EventosScreen> {
                 ),
                 child: Stack(
                   children: [
-                    EventDetails(evento: evento, context),
+                    EventDetails(evento: evento, context,
+                     onActionCompleted: () {
+                      Navigator.pop(context, true); // Indica que se debe recargar
+                    },),
                     Positioned(
                       top: 10,
                       right: 10,
@@ -193,8 +202,15 @@ class _EventosScreenState extends State<EventosScreen> {
             ),
           ),
         );
+        
       },
     );
+
+    if (shouldReload == true) {
+    setState(() {
+        _reloadEvents();
+    });
+  }
   }
 
   Widget CircleButton({required IconData icon, required VoidCallback onPressed}) {

@@ -1,7 +1,7 @@
 class Evento {
   final int id;
   final String title;
-  final String? description;
+  final String description;
   final String? imageUrl;
   final int? organizerId;
   final String? category;
@@ -33,7 +33,7 @@ class Evento {
       category: json['category'] ?? '',
       categoryid: json['category_id'] ?? 0,
       startTime: DateTime.parse(json['start_time']),
-      endTime: DateTime.parse(json['end_time']) ?? DateTime.now(),
+      endTime: DateTime.parse(json['end_time']),
       location: json['location'] ?? '',
     );
   }
