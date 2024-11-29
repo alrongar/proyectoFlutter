@@ -13,7 +13,7 @@ class EventDetails extends StatefulWidget {
 }
 
 class _EventDetailsState extends State<EventDetails> {
-  
+
   var btnText = '';
 
 @override
@@ -22,15 +22,15 @@ class _EventDetailsState extends State<EventDetails> {
 
     btnText = widget.evento.category == '' ? "Borrarse" : "Apuntarse";
   }
- 
+
   @override
   Widget build(BuildContext context) {
     EventServices eventServices = new EventServices();
-    
+
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(16.0),
-        margin: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.all(1.0),
+        margin: const EdgeInsets.symmetric(horizontal: 1.0),
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(16.0),
@@ -39,7 +39,7 @@ class _EventDetailsState extends State<EventDetails> {
               color: Colors.grey.withOpacity(0.2),
               spreadRadius: 2,
               blurRadius: 8,
-              offset: const Offset(0, 4), // Cambiar la posición de la sombra
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -47,18 +47,17 @@ class _EventDetailsState extends State<EventDetails> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Título del evento
             Text(
               widget.evento.title,
               style: const TextStyle(
-                fontSize: 28,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.blueAccent,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
-            // Imagen del evento (con un tamaño fijo para mantener el diseño limpio)
+
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
               child: Image.network(
@@ -68,7 +67,7 @@ class _EventDetailsState extends State<EventDetails> {
                 fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             // Descripción del evento
             Text(
               widget.evento.description,
@@ -79,7 +78,7 @@ class _EventDetailsState extends State<EventDetails> {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             // Fecha del evento
             Text(
               'Fecha: ${widget.evento.startTime}',
@@ -91,7 +90,6 @@ class _EventDetailsState extends State<EventDetails> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            // Botón para apuntarse al evento
             ElevatedButton(
               onPressed: () {
                 if (widget.evento.category == '') {
@@ -107,11 +105,12 @@ class _EventDetailsState extends State<EventDetails> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content: Text(
-                              'Hubo un problema al borrarse del evento.')),
+                              'Hubo un problema al borrarse del evento.')
+                      ),
                     );
                   }
                 } else {
-                  
+
                   try {
                     eventServices.registerEvent(widget.evento);
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -128,11 +127,11 @@ class _EventDetailsState extends State<EventDetails> {
                     );
                   }
                 }
-                
+
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                backgroundColor: Colors.blueAccent,
+                backgroundColor:Color(0xFF001D3D),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
