@@ -1,8 +1,10 @@
+import 'package:eventify_flutter/config/rutes/app_routes.dart';
 import 'package:eventify_flutter/models/event.dart';
 import 'package:eventify_flutter/presentation/screens/events/info_event_screen.dart';
 import 'package:eventify_flutter/presentation/widgets/cardevents/event_card.dart';
 import 'package:eventify_flutter/providers/event_service.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
@@ -33,10 +35,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     registeredEvents = eventServices.fetchRegisteredEvents();
   }
 
-  void _reloadEvents() {
-    setState(() {
-      registeredEvents = eventServices.fetchRegisteredEvents(); 
-    });
+  bool _reloadEvents() {
+    bool canReload = false;
+    try {
+      setState(() {
+        registeredEvents = eventServices.fetchRegisteredEvents();
+        canReload = true;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al recargar la pantalla')),
+      );
+    }
+    return canReload;
   }
 
   @override
@@ -85,7 +96,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   Future<void> _showEventDetails(BuildContext context, Evento evento) async {
-    final shouldReload = await showModalBottomSheet(
+    showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -119,9 +130,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     EventDetails(
                       evento: evento,
                       context,
-                      onActionCompleted: () {
-                        Navigator.pop(
-                            context, true); // Indica que se debe recargar
+                      onActionCompleted: () async {
+
+                        final prefs = await SharedPreferences.getInstance();
+                        final email = prefs.getString('email');
+                        await _reloadEvents();
+                        Navigator.pushNamed(context, AppRoutes.home,
+                            arguments: email);
+
+                         
                       },
                     ),
                     Positioned(
@@ -142,11 +159,5 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         );
       },
     );
-
-    if (shouldReload == true) {
-      setState(() {
-        _reloadEvents();
-      });
-    }
   }
 }

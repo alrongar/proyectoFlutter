@@ -1,5 +1,7 @@
+import 'package:eventify_flutter/config/rutes/app_routes.dart';
 import 'package:eventify_flutter/presentation/screens/events/info_event_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/event.dart';
 import '../../../models/category.dart';
 import '../../../providers/event_service.dart';
@@ -34,14 +36,24 @@ class _EventosScreenState extends State<EventosScreen> {
   void initState() {
     super.initState();
     eventos = EventServices().loadEvents();
-    
+
     categories = eventServices.fetchCategories();
   }
 
-  void _reloadEvents() {
-    setState(() {
-      eventos = eventServices.loadEvents();
-    });
+  bool _reloadEvents() {
+    bool canReload = false;
+    try {
+      setState(() {
+        eventos = eventServices.loadEvents();
+        canReload = true;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al recargar la pantalla')),
+      );
+    }
+    print(1);
+    return canReload;
   }
 
   @override
@@ -58,7 +70,9 @@ class _EventosScreenState extends State<EventosScreen> {
             } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
               List<Evento> eventos = snapshot.data!;
               if (selectedCategory != categoryAll) {
-                eventos = eventos.where((evento) => evento.category == selectedCategory).toList();
+                eventos = eventos
+                    .where((evento) => evento.category == selectedCategory)
+                    .toList();
               }
               return ListView.builder(
                 itemCount: eventos.length,
@@ -151,7 +165,7 @@ class _EventosScreenState extends State<EventosScreen> {
   }
 
   Future<void> _showEventDetails(BuildContext context, Evento evento) async {
-    final shouldReload = await showModalBottomSheet(
+    showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -182,10 +196,16 @@ class _EventosScreenState extends State<EventosScreen> {
                 ),
                 child: Stack(
                   children: [
-                    EventDetails(evento: evento, context,
-                     onActionCompleted: () {
-                      Navigator.pop(context, true); // Indica que se debe recargar
-                    },),
+                    EventDetails(
+                      evento: evento,
+                      context,
+                      onActionCompleted: () async {
+                        bool canReload = await _reloadEvents();
+                        Navigator.pop(
+                            context,
+                            canReload);
+                      },
+                    ),
                     Positioned(
                       top: 10,
                       right: 10,
@@ -202,18 +222,12 @@ class _EventosScreenState extends State<EventosScreen> {
             ),
           ),
         );
-        
       },
     );
-
-    if (shouldReload == true) {
-    setState(() {
-        _reloadEvents();
-    });
-  }
   }
 
-  Widget CircleButton({required IconData icon, required VoidCallback onPressed}) {
+  Widget CircleButton(
+      {required IconData icon, required VoidCallback onPressed}) {
     return CircleAvatar(
       radius: 30,
       backgroundColor: backgroundColor,

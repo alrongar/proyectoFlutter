@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import '../../../providers/event_service.dart';
 import '../../../models/event.dart';
@@ -15,7 +16,7 @@ class EmailService {
     required String toEmail,
     required String subject,
     required String body,
-    required Uint8List attachmentBytes,
+    required File pdfFile,
     required String fileName,
   }) async {
     final smtpServer = gmail('cistianlr@gmail.com', '11022003'); // Usa tu correo y contraseña de aplicación
@@ -26,10 +27,7 @@ class EmailService {
       ..subject = subject
       ..text = body
       ..attachments = [
-        FileAttachment(
-          File.fromRawPath(attachmentBytes), // Convertir bytes a archivo
-
-        ),
+        FileAttachment(pdfFile),
       ];
 
     try {
@@ -56,7 +54,7 @@ class _ReportScreenState extends State<ReportScreen> {
   final List<String> _selectedCategories = [];
   List<Category> _categories = [];
   
-  get email => null;
+  
 
   @override
   void initState() {
@@ -196,17 +194,21 @@ class _ReportScreenState extends State<ReportScreen> {
 
   
 
-  Future<void> _sendEmail(String pdfFilePath) async {
+  Future<void> _sendEmail(File file) async {
     final emailService = EmailService();
-    final file = File(pdfFilePath);
-    final fileBytes = await file.readAsBytes();
-    await emailService.sendEmail(
+    
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('email');
+    if (email!.isNotEmpty) {
+      await emailService.sendEmail(
       toEmail: email,  // Dirección de correo del destinatario
       subject: 'Informe de eventos',
       body: 'Adjunto el informe generado en formato PDF.',
-      attachmentBytes: fileBytes,
+      pdfFile: file,
       fileName: 'informe_eventos.pdf',
     );
+    }
+    
   }
 
   @override
@@ -261,70 +263,7 @@ class _ReportScreenState extends State<ReportScreen> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  if (_startDate == null || _endDate == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Por favor, seleccione las fechas de inicio y fin')),
-                    );
-                    return;
-                  }
-                      print(email);
-
-                  if (_formKey.currentState?.validate() ?? false) {
-                    _formKey.currentState?.save();
-
-                    List<Evento> events = await EventServices().fetchEventos();
-                    events = events.where((event) {
-                      bool matchesDate = true;
-                      bool matchesCategory = _selectedCategories.contains(event.category);
-                      if (_startDate != null) {
-                        matchesDate = matchesDate && event.startTime.isAfter(_startDate!);
-                      }
-                      if (_endDate != null) {
-                        matchesDate = matchesDate && event.startTime.isBefore(_endDate!);
-                      }
-                      return matchesDate && matchesCategory;
-                    }).toList();
-
-                    if (events.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('No hay eventos que cumplan con los criterios seleccionados')),
-                      );
-                      return;
-                    }
-
-                    final pdf = pw.Document();
-                    final List<pw.Widget> eventWidgets = [];
-                    for (var event in events) {
-                      final image = pw.MemoryImage(
-                        (await NetworkAssetBundle(Uri.parse('${event.imageUrl}')).load('${event.imageUrl}')).buffer.asUint8List(),
-                      );
-                      eventWidgets.add(
-                        pw.Container(
-                          alignment: pw.Alignment.centerLeft, // Alinea todos los elementos a la izquierda
-                          child: pw.Column(
-                            crossAxisAlignment: pw.CrossAxisAlignment.start,
-                            children: [
-                              pw.Image(image, width: 100, height: 100),
-                              pw.Text(event.title, style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                              pw.Text('${DateFormat('dd/MM/yyyy').format(event.startTime)} - ${DateFormat('dd/MM/yyyy').format(event.startTime)}'),
-                              pw.SizedBox(height: 10),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                    pdf.addPage(pw.Page(build: (pw.Context context) => pw.Column(children: eventWidgets)));
-
-                    final directory = await _getDownloadDirectory();
-                    final file = File('$directory/report.pdf');
-                    await file.writeAsBytes(await pdf.save());
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('PDF generado y guardado en ${file.path}')),
-                    );
-
-                    await _sendEmail(file.path);
-                  }
+                  _sendEmail( await _generatePDF() as File);
                 },
                 child: const Text('Generar y enviar por correo'),
               ),
