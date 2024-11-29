@@ -153,7 +153,7 @@ class _ReportScreenState extends State<ReportScreen> {
         );
         eventWidgets.add(
           pw.Container(
-            alignment: pw.Alignment.centerLeft, // Alinea todos los elementos a la izquierda
+            alignment: pw.Alignment.center, // Alinea todos los elementos a la izquierda
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
@@ -172,7 +172,7 @@ class _ReportScreenState extends State<ReportScreen> {
       pdf.addPage(pw.Page(
           build: (pw.Context context) => pw.Column(children: eventWidgets)));
 
-      // Save PDF to Download directory
+      // Save PDF to Download directoryzzz
       final directory = await _getDownloadDirectory();
       final file = File('$directory/report.pdf');
       await file.writeAsBytes(await pdf.save());
@@ -215,9 +215,6 @@ class _ReportScreenState extends State<ReportScreen> {
   Widget build(BuildContext context) {
     final email = ModalRoute.of(context)?.settings.arguments as String?;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Generar Reporte'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

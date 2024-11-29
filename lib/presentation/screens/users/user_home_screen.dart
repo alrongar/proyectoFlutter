@@ -142,8 +142,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       },
                     ),
                     Positioned(
-                      top: 10,
-                      right: 10,
+                      right: 5,
                       child: IconButton(
                         icon: const Icon(Icons.close, color: Colors.black),
                         onPressed: () {

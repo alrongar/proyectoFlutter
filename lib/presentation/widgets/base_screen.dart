@@ -19,7 +19,7 @@ class _BaseScreenState extends State<BaseScreen> {
   bool _isUser = false;
   bool _isAuthenticated = false;
 
-  // Verificamos si el token está disponible
+
   Future<void> _loadUserRoles() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? authToken = prefs.getString('auth_token');
@@ -128,7 +128,7 @@ class _BaseScreenState extends State<BaseScreen> {
 
   Future<void> _logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Limpiar datos almacenados
+    await prefs.clear();
     if (context.mounted) {
       Navigator.pushNamedAndRemoveUntil(
           context, '/login', (route) => false); // Redirigir a login
@@ -140,9 +140,22 @@ class _BaseScreenState extends State<BaseScreen> {
     final email = ModalRoute.of(context)?.settings.arguments as String?;
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[_currentIndex]),
+        automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF001D3D),
+        title: Center(
+          child: Text(
+            _titles[_currentIndex],
+            style: const TextStyle(
+              color: Color(0xFFFFC300),
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        toolbarHeight: 70.0,
       ),
+
+
       body: _isAuthenticated
           ? _pages[_currentIndex]
           : const Center(child: CircularProgressIndicator()),
