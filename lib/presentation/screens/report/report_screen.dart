@@ -19,7 +19,8 @@ class EmailService {
     required File pdfFile,
     required String fileName,
   }) async {
-    final smtpServer = gmail('cistianlr@gmail.com', '11022003'); // Usa tu correo y contraseña de aplicación
+    final smtpServer = gmail('cistianlr@gmail.com',
+        '11022003'); // Usa tu correo y contraseña de aplicación
 
     final message = Message()
       ..from = const Address('cistianlr@gmail.com', 'Cris') // Remitente
@@ -53,8 +54,6 @@ class _ReportScreenState extends State<ReportScreen> {
   DateTime? _endDate;
   final List<String> _selectedCategories = [];
   List<Category> _categories = [];
-  
-  
 
   @override
   void initState() {
@@ -152,9 +151,9 @@ class _ReportScreenState extends State<ReportScreen> {
               .asUint8List(),
         );
         eventWidgets.add(
-          pw.Container(
-            alignment: pw.Alignment.center, // Alinea todos los elementos a la izquierda
-            child: pw.Column(
+          
+            
+            pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Image(image, width: 100, height: 100),
@@ -166,11 +165,13 @@ class _ReportScreenState extends State<ReportScreen> {
                 pw.SizedBox(height: 10),
               ],
             ),
-          ),
+          
         );
       }
-      pdf.addPage(pw.Page(
-          build: (pw.Context context) => pw.Column(children: eventWidgets)));
+      pdf.addPage(pw.Page(build: (pw.Context context) => pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: eventWidgets,
+            )));
 
       // Save PDF to Download directoryzzz
       final directory = await _getDownloadDirectory();
@@ -192,18 +193,15 @@ class _ReportScreenState extends State<ReportScreen> {
     return null;
   }
 
-  
-
   void _sendPdf() async {
     try {
-
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final email = prefs.getString('email') ?? "";
 
-      
       final pdfFile = await _generatePDF();
 
-      final smtpServer = gmail('eventifycorreo@gmail.com', 'sgmt xqba wwav mvmc');
+      final smtpServer =
+          gmail('eventifycorreo@gmail.com', 'sgmt xqba wwav mvmc');
       final message = Message()
         ..from = const Address('eventifycorreo@gmail.com', 'Eventify')
         ..recipients.add(email)
@@ -260,15 +258,11 @@ class _ReportScreenState extends State<ReportScreen> {
                 );
               }).toList(),
               const SizedBox(height: 20),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: _generatePDF,
-                    child: const Text('Generar PDF'),
-                  ),
-                  
-                ],
+              ElevatedButton(
+                onPressed: _generatePDF,
+                child: const Text('Generar PDF'),
               ),
+              const SizedBox(height: 40),
               ElevatedButton(
                 onPressed: () async {
                   _sendPdf();
