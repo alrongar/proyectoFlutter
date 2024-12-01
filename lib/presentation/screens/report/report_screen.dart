@@ -194,26 +194,37 @@ class _ReportScreenState extends State<ReportScreen> {
 
   
 
-  Future<void> _sendEmail(File file) async {
-    final emailService = EmailService();
-    
-    final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('email');
-    if (email!.isNotEmpty) {
-      await emailService.sendEmail(
-      toEmail: email,  // Dirección de correo del destinatario
-      subject: 'Informe de eventos',
-      body: 'Adjunto el informe generado en formato PDF.',
-      pdfFile: file,
-      fileName: 'informe_eventos.pdf',
-    );
+  void _sendPdf() async {
+    try {
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString('email') ?? "";
+
+      
+      final pdfFile = await _generatePDF();
+
+      final smtpServer = gmail('eventifycorreo@gmail.com', 'sgmt xqba wwav mvmc');
+      final message = Message()
+        ..from = const Address('eventifycorreo@gmail.com', 'Eventify')
+        ..recipients.add(email)
+        ..subject = 'Informe de eventos'
+        ..text = 'Adjunto se encuentra el informe de eventos solicitado.'
+        ..attachments.add(FileAttachment(File(pdfFile!.path)));
+
+      await send(message, smtpServer);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("PDF enviado por correo")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error al enviar el PDF: $e")),
+      );
     }
-    
   }
 
   @override
   Widget build(BuildContext context) {
-    final email = ModalRoute.of(context)?.settings.arguments as String?;
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -260,7 +271,7 @@ class _ReportScreenState extends State<ReportScreen> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  _sendEmail( await _generatePDF() as File);
+                  _sendPdf();
                 },
                 child: const Text('Generar y enviar por correo'),
               ),

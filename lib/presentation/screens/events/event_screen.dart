@@ -1,7 +1,5 @@
-import 'package:eventify_flutter/config/rutes/app_routes.dart';
 import 'package:eventify_flutter/presentation/screens/events/info_event_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/event.dart';
 import '../../../models/category.dart';
 import '../../../providers/event_service.dart';
@@ -52,7 +50,6 @@ class _EventosScreenState extends State<EventosScreen> {
         const SnackBar(content: Text('Error al recargar la pantalla')),
       );
     }
-    print(1);
     return canReload;
   }
 
@@ -143,8 +140,8 @@ class _EventosScreenState extends State<EventosScreen> {
                 isFilterVisible = !isFilterVisible;
               });
             },
-            child: const Icon(Icons.filter_list, color: Colors.white),
             backgroundColor: backgroundColor,
+            child: const Icon(Icons.filter_list, color: Colors.white),
           ),
         ),
       ],

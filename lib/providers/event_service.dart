@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class EventServices {
   Future<List<Evento>> loadEvents() async {
     try {
-      final token = await _getToken();
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id');
 
