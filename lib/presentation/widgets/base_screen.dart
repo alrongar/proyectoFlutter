@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/events/event_screen.dart';
 import '../screens/users/admin_user_screen.dart';
 import '../screens/report/report_screen.dart';
+import '../screens/users/organaizer_screen.dart';
 import '../screens/users/user_home_screen.dart';
 
 class BaseScreen extends StatefulWidget {
@@ -17,8 +18,8 @@ class _BaseScreenState extends State<BaseScreen> {
   int _currentIndex = 0;
   bool _isAdmin = false;
   bool _isUser = false;
+  bool _isOrganizer = false;
   bool _isAuthenticated = false;
-
 
   Future<void> _loadUserRoles() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -28,6 +29,7 @@ class _BaseScreenState extends State<BaseScreen> {
         _isAuthenticated = true;
         _isAdmin = prefs.getString('role') == 'a';
         _isUser = prefs.getString('role') == 'u';
+        _isOrganizer = prefs.getString('role') == 'o';
       });
     } else {
       setState(() {
@@ -57,9 +59,13 @@ class _BaseScreenState extends State<BaseScreen> {
 
     if (_isUser) {
       final email = ModalRoute.of(context)?.settings.arguments as String?;
-      if (email!.isNotEmpty) {
-        pages.add(ReportScreen(email: email));
+      if (email?.isNotEmpty == true) {
+        pages.add(ReportScreen(email: email!));
       }
+    }
+
+    if (_isOrganizer) {
+      pages.add(const OrganizerScreen());
     }
 
     return pages;
@@ -77,6 +83,10 @@ class _BaseScreenState extends State<BaseScreen> {
 
     if (_isUser) {
       titles.add('Informe');
+    }
+
+    if (_isOrganizer) {
+      titles.add('Organizador');
     }
 
     return titles;
@@ -108,6 +118,13 @@ class _BaseScreenState extends State<BaseScreen> {
       ));
     }
 
+    if (_isOrganizer) {
+      items.add(const BottomNavigationBarItem(
+        icon: Icon(Icons.people),
+        label: 'Organizador',
+      ));
+    }
+
     items.add(const BottomNavigationBarItem(
       icon: Icon(Icons.logout),
       label: 'Logout',
@@ -130,14 +147,12 @@ class _BaseScreenState extends State<BaseScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     if (context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(
-          context, '/login', (route) => false); // Redirigir a login
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final email = ModalRoute.of(context)?.settings.arguments as String?;
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -154,20 +169,18 @@ class _BaseScreenState extends State<BaseScreen> {
         ),
         toolbarHeight: 70.0,
       ),
-
-
       body: _isAuthenticated
           ? _pages[_currentIndex]
           : const Center(child: CircularProgressIndicator()),
       bottomNavigationBar: _isAuthenticated
           ? BottomNavigationBar(
-              currentIndex: _currentIndex,
-              onTap: _onItemTapped,
-              items: _menuItems,
-              selectedItemColor: const Color(0xFFFFC300),
-              unselectedItemColor: Colors.grey,
-              backgroundColor: const Color(0xFF001D3D),
-            )
+        currentIndex: _currentIndex,
+        onTap: _onItemTapped,
+        items: _menuItems,
+        selectedItemColor: const Color(0xFFFFC300),
+        unselectedItemColor: Colors.grey,
+        backgroundColor: const Color(0xFF001D3D),
+      )
           : null,
     );
   }
@@ -180,8 +193,7 @@ class _BaseScreenState extends State<BaseScreen> {
     } catch (e) {
       print('Error al recargar eventos: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Hubo un problema al recargar los eventos.')),
+        const SnackBar(content: Text('Hubo un problema al recargar los eventos.')),
       );
     }
   }
