@@ -41,15 +41,23 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
               child: BarChart(
                 BarChartData(
                   gridData: FlGridData(show: false),
-                  titlesData: FlTitlesData(show: true),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: true),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: true),
+                    ),
+                  ),
                   borderData: FlBorderData(show: false),
                   barGroups: [
                     BarChartGroupData(
                       x: 0,
                       barRods: [
                         BarChartRodData(
-                          y: 150,
-                          colors: [Colors.blue],
+                          toY: 150,
+                          color: Colors.blue,
                           width: 20,
                           borderRadius: BorderRadius.circular(5),
                         ),
@@ -59,8 +67,8 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
                       x: 1,
                       barRods: [
                         BarChartRodData(
-                          y: 120,
-                          colors: [Colors.blue],
+                          toY: 120,
+                          color: Colors.blue,
                           width: 20,
                           borderRadius: BorderRadius.circular(5),
                         ),
@@ -70,8 +78,8 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
                       x: 2,
                       barRods: [
                         BarChartRodData(
-                          y: 200,
-                          colors: [Colors.blue],
+                          toY: 200,
+                          color: Colors.blue,
                           width: 20,
                           borderRadius: BorderRadius.circular(5),
                         ),

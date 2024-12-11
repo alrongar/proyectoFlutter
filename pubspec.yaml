@@ -41,7 +41,7 @@ dependencies:
   mailer: ^6.0.0
   intl: ^0.17.0
   charts_flutter_new: ^0.12.0
-  fl_chart: ^0.36.0
+  fl_chart: ^0.69.2
 dev_dependencies:
 
   # The "flutter_lints" package below contains a set of recommended lints to
