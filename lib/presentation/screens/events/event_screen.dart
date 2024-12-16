@@ -4,6 +4,7 @@ import '../../../models/event.dart';
 import '../../../models/category.dart';
 import '../../../providers/event_service.dart';
 import 'package:eventify_flutter/presentation/widgets/cardevents/event_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EventosScreen extends StatefulWidget {
   const EventosScreen({super.key});
@@ -18,6 +19,8 @@ class _EventosScreenState extends State<EventosScreen> {
   late Future<List<Category>> categories;
   String selectedCategory = 'All';
   bool isFilterVisible = false;
+  bool isOrganizer = false;
+  bool isUser = false;
 
   static const Color backgroundColor = Color(0xFF1A1A2E);
   static const Color musicEventColor = Colors.yellow;
@@ -25,24 +28,43 @@ class _EventosScreenState extends State<EventosScreen> {
   static const Color technologyEventColor = Colors.green;
   static const Color defaultEventColor = Colors.black;
 
-  static const String categoryAll = 'All';
-  static const String categoryMusic = 'Music';
-  static const String categorySport = 'Sport';
-  static const String categoryTechnology = 'Technology';
-
   @override
   void initState() {
     super.initState();
-    eventos = EventServices().loadEvents();
+    eventos = Future.value([]); // Inicializar eventos con una lista vacía
+    _loadUserRole();
+    categories = EventServices().fetchCategories();
+  }
 
-    categories = eventServices.fetchCategories();
+  Future<void> _loadUserRole() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? role = prefs.getString('role');
+    String? userId = prefs.getString('user_id'); // Recuperar user_id como String
+    if (role == 'o') {
+      setState(() {
+        isOrganizer = true;
+        eventos = EventServices().fetchEventosByOrganizer(userId!);
+      });
+    } else if (role == 'u') {
+      setState(() {
+        isUser = true;
+        eventos = EventServices().fetchEventos();
+      });
+    }
   }
 
   bool _reloadEvents() {
     bool canReload = false;
     try {
       setState(() {
-        eventos = eventServices.loadEvents();
+        if (isOrganizer) {
+          SharedPreferences.getInstance().then((prefs) {
+            String? userId = prefs.getString('user_id'); // Recuperar user_id como String
+            eventos = EventServices().fetchEventosByOrganizer(userId!);
+          });
+        } else {
+          eventos = EventServices().fetchEventos();
+        }
         canReload = true;
       });
     } catch (e) {
@@ -66,7 +88,7 @@ class _EventosScreenState extends State<EventosScreen> {
               return const Center(child: Text("Error al cargar eventos"));
             } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
               List<Evento> eventos = snapshot.data!;
-              if (selectedCategory != categoryAll) {
+              if (selectedCategory != 'All') {
                 eventos = eventos
                     .where((evento) => evento.category == selectedCategory)
                     .toList();
@@ -91,70 +113,63 @@ class _EventosScreenState extends State<EventosScreen> {
           Positioned(
             bottom: 80,
             right: 8,
-            child: Column(
-              children: [
-                CircleButton(
-                  icon: Icons.music_note,
-                  onPressed: () {
-                    setState(() {
-                      selectedCategory = categoryMusic;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-                CircleButton(
-                  icon: Icons.sports,
-                  onPressed: () {
-                    setState(() {
-                      selectedCategory = categorySport;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-                CircleButton(
-                  icon: Icons.computer,
-                  onPressed: () {
-                    setState(() {
-                      selectedCategory = categoryTechnology;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-                CircleButton(
-                  icon: Icons.all_inclusive,
-                  onPressed: () {
-                    setState(() {
-                      selectedCategory = categoryAll;
-                    });
-                  },
-                ),
-              ],
+            child: FutureBuilder<List<Category>>(
+              future: categories,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error al cargar categorías');
+                } else if (snapshot.hasData) {
+                  List<Category> categories = snapshot.data!;
+                  return Column(
+                    children: categories.map((Category category) {
+                      return Column(
+                        children: [
+                          CircleButton(
+                            icon: Icons.category,
+                            onPressed: () {
+                              setState(() {
+                                selectedCategory = category.name;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      );
+                    }).toList(),
+                  );
+                } else {
+                  return Text('No hay categorías disponibles');
+                }
+              },
             ),
           ),
-        Positioned(
-          bottom: 20,
-          right: 8,
-          child: FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                isFilterVisible = !isFilterVisible;
-              });
-            },
-            backgroundColor: backgroundColor,
-            child: const Icon(Icons.filter_list, color: Colors.white),
+        if (isOrganizer)
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/createEvent').then((_) {
+                  _reloadEvents();
+                });
+              },
+              backgroundColor: backgroundColor,
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
           ),
-        ),
       ],
     );
   }
 
   Color getBorderColor(Evento evento) {
     switch (evento.category) {
-      case categoryMusic:
+      case 'Music':
         return musicEventColor;
-      case categorySport:
+      case 'Sport':
         return sportEventColor;
-      case categoryTechnology:
+      case 'Technology':
         return technologyEventColor;
       default:
         return defaultEventColor;
@@ -198,9 +213,7 @@ class _EventosScreenState extends State<EventosScreen> {
                       context,
                       onActionCompleted: () async {
                         bool canReload = await _reloadEvents();
-                        Navigator.pop(
-                            context,
-                            canReload);
+                        Navigator.pop(context, canReload);
                       },
                     ),
                     Positioned(
@@ -213,6 +226,44 @@ class _EventosScreenState extends State<EventosScreen> {
                         },
                       ),
                     ),
+                    if (isOrganizer)
+                      Positioned(
+                        bottom: 10,
+                        left: 10,
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/editEvent',
+                                  arguments: evento,
+                                ).then((_) {
+                                  _reloadEvents();
+                                });
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                bool confirmed = await _showDeleteConfirmationDialog(context);
+                                if (confirmed) {
+                                  try {
+                                    await EventServices().deleteEvent(evento.id.toString());
+                                    _reloadEvents();
+                                    Navigator.pop(context);
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Error al eliminar el evento: $e')),
+                                    );
+                                  }
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -223,8 +274,29 @@ class _EventosScreenState extends State<EventosScreen> {
     );
   }
 
-  Widget CircleButton(
-      {required IconData icon, required VoidCallback onPressed}) {
+  Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirmar Eliminación'),
+          content: const Text('¿Estás seguro de que deseas eliminar este evento?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
+  }
+
+  Widget CircleButton({required IconData icon, required VoidCallback onPressed}) {
     return CircleAvatar(
       radius: 30,
       backgroundColor: backgroundColor,

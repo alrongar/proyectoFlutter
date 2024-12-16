@@ -5,40 +5,11 @@ import '../models/category.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EventServices {
-  Future<List<Evento>> loadEvents() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('user_id');
-
-      if (userId == null) {
-        throw Exception('Usuario o token no encontrados en preferencias.');
-      }
-
-      // Obtén los eventos registrados
-      var registeredEvents = await fetchRegisteredEvents();
-
-      // Obtén todos los eventos
-      final allFetchedEvents = await fetchEventos();
-
-      // Filtra los eventos registrados
-      var allEvents = allFetchedEvents.where((event) {
-        return !registeredEvents
-            .any((registeredEvent) => registeredEvent.id == event.id);
-      }).toList();
-
-      return allEvents;
-    } catch (e) {
-      print('Error al cargar los eventos: $e');
-      return [];
-    }
-  }
-
   Future<String> _getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('auth_token') ?? '';
   }
 
-  // Obtener lista de eventos
   Future<List<Evento>> fetchEventos() async {
     try {
       final token = await _getToken();
@@ -54,21 +25,126 @@ class EventServices {
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         if (jsonResponse['success']) {
-          
           List<dynamic> jsonList = jsonResponse['data'];
-          
           return jsonList.map((json) => Evento.fromJson(json)).toList();
         } else {
-          throw Exception(
-              'No se pudo obtener eventos: ${jsonResponse['message']}');
+          throw Exception('No se pudo obtener eventos: ${jsonResponse['message']}');
         }
       } else {
-        throw Exception(
-            'Error al cargar eventos. Código: ${response.statusCode}');
+        throw Exception('Error al cargar eventos. Código: ${response.statusCode}');
       }
     } catch (e) {
       print('Error en fetchEventos: $e');
       throw Exception('Error: $e');
+    }
+  }
+
+  Future<List<Evento>> fetchEventosByOrganizer(String organizerId) async {
+    try {
+      final token = await _getToken();
+      final response = await http.get(
+        Uri.parse('https://eventify.allsites.es/public/api/events?organizer_id=$organizerId'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['success']) {
+          List<dynamic> jsonList = jsonResponse['data'];
+          return jsonList.map((json) => Evento.fromJson(json)).toList();
+        } else {
+          throw Exception('No se pudo obtener eventos: ${jsonResponse['message']}');
+        }
+      } else {
+        throw Exception('Error al cargar eventos. Código: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en fetchEventosByOrganizer: $e');
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<int> createEvent(Evento evento) async {
+    try {
+      final token = await _getToken();
+      final response = await http.post(
+        Uri.parse('https://eventify.allsites.es/public/api/events'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'organizer_id': evento.organizerId,
+          'title': evento.title,
+          'description': evento.description,
+          'category_id': evento.categoryid,
+          'start_time': evento.startTime.toIso8601String(),
+          'end_time': evento.endTime?.toIso8601String(),
+          'location': evento.location,
+          'price': evento.price,
+          'image_url': evento.imageUrl,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        return jsonResponse['data']['id'];
+      } else {
+        print('Error al crear el evento. Código: ${response.statusCode}');
+        print('Respuesta del servidor: ${response.body}');
+        throw Exception('Error al crear el evento. Código: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en createEvent: $e');
+      throw Exception('Error al crear el evento');
+    }
+  }
+
+  Future<void> updateEvent(Evento evento) async {
+    try {
+      final token = await _getToken();
+      final response = await http.put(
+        Uri.parse('https://eventify.allsites.es/public/api/events/${evento.id}'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(evento.toJson()),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Error al actualizar el evento. Código: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en updateEvent: $e');
+      throw Exception('Error al actualizar el evento');
+    }
+  }
+
+  Future<void> deleteEvent(String eventId) async {
+    try {
+      final token = await _getToken();
+      final response = await http.delete(
+        Uri.parse('https://eventify.allsites.es/public/api/events/$eventId'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Error al eliminar el evento. Código: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en deleteEvent: $e');
+      throw Exception('Error al eliminar el evento');
     }
   }
 

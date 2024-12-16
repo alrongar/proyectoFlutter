@@ -2,8 +2,10 @@ import 'package:eventify_flutter/presentation/screens/events/event_screen.dart';
 import 'package:eventify_flutter/presentation/screens/login/login_screen.dart';
 import 'package:eventify_flutter/presentation/screens/login/register_screen.dart';
 import 'package:eventify_flutter/presentation/screens/users/admin_user_screen.dart';
+import 'package:eventify_flutter/presentation/screens/events/create_event_screen.dart';
+import 'package:eventify_flutter/presentation/screens/events/edit_event_screen.dart';
 import 'package:eventify_flutter/presentation/screens/report/report_screen.dart';
-import 'package:eventify_flutter/presentation/widgets/base_screen.dart'; // Importamos BaseScreen
+import 'package:eventify_flutter/presentation/widgets/base_screen.dart';
 import 'package:eventify_flutter/providers/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,17 +36,17 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/admin': (context) => const UserListScreen(),
-       
-        '/home': (context,){
+        '/home': (context) {
           final email = ModalRoute.of(context)?.settings.arguments as String?;
-          
-          return BaseScreen(email: email ?? ''); 
+          return BaseScreen(email: email ?? '');
         },
         '/eventos': (context) => EventosScreen(),
-        '/report': (context){
+        '/report': (context) {
           final email = ModalRoute.of(context)?.settings.arguments as String?;
-          return ReportScreen(email: email ?? ''); 
+          return ReportScreen(email: email ?? '');
         },
+        '/createEvent': (context) => CreateEventScreen(), // Añade la ruta para crear eventos
+        '/editEvent': (context) => EditEventScreen(), // Añade la ruta para editar eventos
       },
     );
   }
