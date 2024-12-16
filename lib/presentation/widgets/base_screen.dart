@@ -48,25 +48,33 @@ class _BaseScreenState extends State<BaseScreen> {
   }
 
   List<Widget> get _pages {
-    final pages = [
-      const UserHomeScreen(),
-      EventosScreen(),
-    ];
-
-    if (_isAdmin) {
-      pages.add(const UserListScreen());
-    }
+    final List<Widget> pages = [];
 
     if (_isUser) {
+      pages.addAll([
+        const UserHomeScreen(),
+        const EventosScreen(),
+      ]);
       final email = ModalRoute.of(context)?.settings.arguments as String?;
       if (email?.isNotEmpty == true) {
         pages.add(ReportScreen(email: email!));
       }
     }
 
-    if (_isOrganizer) {
-      pages.add(const OrganizerScreen());
+    
+
+    if (_isAdmin) {
+      pages.add(const UserListScreen());
     }
+
+    
+
+    if (_isOrganizer) {
+    pages.addAll([
+      const EventosScreen(),
+      const OrganizerScreen(data: {}),
+    ]);
+  }
 
     return pages;
   }
@@ -93,7 +101,10 @@ class _BaseScreenState extends State<BaseScreen> {
   }
 
   List<BottomNavigationBarItem> get _menuItems {
-    final items = [
+    final items = <BottomNavigationBarItem>[];
+
+  if (_isUser) {
+    items.addAll([
       const BottomNavigationBarItem(
         icon: Icon(Icons.home),
         label: 'Home',
@@ -102,35 +113,40 @@ class _BaseScreenState extends State<BaseScreen> {
         icon: Icon(Icons.event),
         label: 'Eventos',
       ),
-    ];
-
-    if (_isAdmin) {
-      items.add(const BottomNavigationBarItem(
-        icon: Icon(Icons.admin_panel_settings),
-        label: 'Admin',
-      ));
-    }
-
-    if (_isUser) {
-      items.add(const BottomNavigationBarItem(
+      const BottomNavigationBarItem(
         icon: Icon(Icons.report),
         label: 'Informe',
-      ));
-    }
+      ),
+    ]);
+  }
 
-    if (_isOrganizer) {
-      items.add(const BottomNavigationBarItem(
+  if (_isAdmin) {
+    items.add(const BottomNavigationBarItem(
+      icon: Icon(Icons.admin_panel_settings),
+      label: 'Admin',
+    ));
+  }
+
+  if (_isOrganizer) {
+    items.addAll([
+      const BottomNavigationBarItem(
+        icon: Icon(Icons.event),
+        label: 'Eventos',
+      ),
+      const BottomNavigationBarItem(
         icon: Icon(Icons.people),
         label: 'Organizador',
-      ));
-    }
+      ),
+    ]);
+  }
 
-    items.add(const BottomNavigationBarItem(
-      icon: Icon(Icons.logout),
-      label: 'Logout',
-    ));
+  // Botón Logout para todos
+  items.add(const BottomNavigationBarItem(
+    icon: Icon(Icons.logout),
+    label: 'Logout',
+  ));
 
-    return items;
+  return items;
   }
 
   void _onItemTapped(int index) {
@@ -174,13 +190,13 @@ class _BaseScreenState extends State<BaseScreen> {
           : const Center(child: CircularProgressIndicator()),
       bottomNavigationBar: _isAuthenticated
           ? BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onItemTapped,
-        items: _menuItems,
-        selectedItemColor: const Color(0xFFFFC300),
-        unselectedItemColor: Colors.grey,
-        backgroundColor: const Color(0xFF001D3D),
-      )
+              currentIndex: _currentIndex,
+              onTap: _onItemTapped,
+              items: _menuItems,
+              selectedItemColor: const Color(0xFFFFC300),
+              unselectedItemColor: Colors.grey,
+              backgroundColor: const Color(0xFF001D3D),
+            )
           : null,
     );
   }
@@ -193,7 +209,8 @@ class _BaseScreenState extends State<BaseScreen> {
     } catch (e) {
       print('Error al recargar eventos: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Hubo un problema al recargar los eventos.')),
+        const SnackBar(
+            content: Text('Hubo un problema al recargar los eventos.')),
       );
     }
   }

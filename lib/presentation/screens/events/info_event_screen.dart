@@ -4,9 +4,10 @@ import '../../../models/event.dart';
 
 class EventDetails extends StatefulWidget {
   final Evento evento;
+  final bool isOrganizer;
   final VoidCallback onActionCompleted;
 
-  EventDetails(BuildContext context, {super.key, required this.evento, required this.onActionCompleted});
+  const EventDetails(BuildContext context, {super.key, required this.evento, required this.onActionCompleted, required this.isOrganizer});
 
   @override
   State<EventDetails> createState() => _EventDetailsState();
@@ -15,6 +16,8 @@ class EventDetails extends StatefulWidget {
 class _EventDetailsState extends State<EventDetails> {
 
   var btnText = '';
+  
+  
 
 @override
   void initState() {
@@ -90,6 +93,7 @@ class _EventDetailsState extends State<EventDetails> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
+            if (!widget.isOrganizer)
             ElevatedButton(
               onPressed: () {
                 if (widget.evento.category == '') {

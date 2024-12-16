@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class OrganizerScreen extends StatefulWidget {
-  const OrganizerScreen({super.key});
+  final Map<String, int> data;
+
+  const OrganizerScreen({super.key, required this.data});
 
   @override
   _OrganizerScreenState createState() => _OrganizerScreenState();
@@ -40,8 +42,8 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
               height: 200,
               child: BarChart(
                 BarChartData(
-                  gridData: FlGridData(show: false),
-                  titlesData: FlTitlesData(
+                  gridData: const FlGridData(show: false),
+                  titlesData: const FlTitlesData(
                     show: true,
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(showTitles: true),
@@ -51,41 +53,22 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
                     ),
                   ),
                   borderData: FlBorderData(show: false),
-                  barGroups: [
-                    BarChartGroupData(
-                      x: 0,
-                      barRods: [
-                        BarChartRodData(
-                          toY: 150,
-                          color: Colors.blue,
-                          width: 20,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ],
-                    ),
-                    BarChartGroupData(
-                      x: 1,
-                      barRods: [
-                        BarChartRodData(
-                          toY: 120,
-                          color: Colors.blue,
-                          width: 20,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ],
-                    ),
-                    BarChartGroupData(
-                      x: 2,
-                      barRods: [
-                        BarChartRodData(
-                          toY: 200,
-                          color: Colors.blue,
-                          width: 20,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ],
-                    ),
-                  ],
+                  barGroups: List.from(widget.data.entries)
+            .asMap()
+            .map((index, entry) => MapEntry(
+                  index,
+                  BarChartGroupData(
+                    x: index,
+                    barRods: [
+                      BarChartRodData(
+                        toY: entry.value.toDouble(),
+                        color: Color(Colors.blue as int)
+                        )
+                    ],
+                  ),
+                ))
+            .values
+            .toList(),
                 ),
               ),
             ),

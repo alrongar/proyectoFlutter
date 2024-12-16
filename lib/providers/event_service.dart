@@ -42,12 +42,13 @@ class EventServices {
   Future<List<Evento>> fetchEventosByOrganizer(String organizerId) async {
     try {
       final token = await _getToken();
-      final response = await http.get(
-        Uri.parse('https://eventify.allsites.es/public/api/events?organizer_id=$organizerId'),
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getString('user_id');
+      final response = await http.post(
+        Uri.parse('https://eventify.allsites.es/public/api/eventsByOrganizer?id=$userId'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
         },
       );
 

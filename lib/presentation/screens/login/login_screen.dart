@@ -43,12 +43,13 @@ class LoginScreenState extends State<LoginScreen> {
         );
 
         final data = jsonDecode(response.body);
+        print(data);
         if (response.statusCode == 200) {
           final token = data['data']['token'];
           final userId =
               data['data']['id']; // Suponiendo que el id del usuario está aquí
           final role = data['data']['role'];
-
+          print(role == 'o');
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('auth_token', token);
           await prefs.setString(

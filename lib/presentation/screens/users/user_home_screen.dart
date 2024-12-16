@@ -68,7 +68,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 final evento = snapshot.data![index];
                 Color borderColor = getBorderColor(evento);
                 return GestureDetector(
-                  onTap: () => _showEventDetails(context, evento),
+                  onTap: () => _showEventDetails(context, evento, false),
                   child: EventCard(evento: evento, borderColor: borderColor),
                 );
               },
@@ -95,7 +95,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
   }
 
-  Future<void> _showEventDetails(BuildContext context, Evento evento) async {
+  Future<void> _showEventDetails(BuildContext context, Evento evento, bool isOrganizer) async {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -130,6 +130,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     EventDetails(
                       evento: evento,
                       context,
+                      isOrganizer: isOrganizer,
                       onActionCompleted: () async {
 
                         final prefs = await SharedPreferences.getInstance();
@@ -139,7 +140,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             arguments: email);
 
                          
-                      },
+                      }, 
                     ),
                     Positioned(
                       right: 5,

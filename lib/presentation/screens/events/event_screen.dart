@@ -37,13 +37,16 @@ class _EventosScreenState extends State<EventosScreen> {
   }
 
   Future<void> _loadUserRole() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    
+    final prefs = await SharedPreferences.getInstance();
     String? role = prefs.getString('role');
     String? userId = prefs.getString('user_id'); // Recuperar user_id como String
+    
     if (role == 'o') {
       setState(() {
         isOrganizer = true;
         eventos = EventServices().fetchEventosByOrganizer(userId!);
+      print(eventos.toString());
       });
     } else if (role == 'u') {
       setState(() {
@@ -99,7 +102,7 @@ class _EventosScreenState extends State<EventosScreen> {
                   Evento evento = eventos[index];
                   Color borderColor = getBorderColor(evento);
                   return GestureDetector(
-                    onTap: () => _showEventDetails(context, evento),
+                    onTap: () => _showEventDetails(context, evento, isOrganizer),
                     child: EventCard(evento: evento, borderColor: borderColor),
                   );
                 },
@@ -176,7 +179,7 @@ class _EventosScreenState extends State<EventosScreen> {
     }
   }
 
-  Future<void> _showEventDetails(BuildContext context, Evento evento) async {
+  Future<void> _showEventDetails(BuildContext context, Evento evento, bool isOrganizer) async {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -211,6 +214,7 @@ class _EventosScreenState extends State<EventosScreen> {
                     EventDetails(
                       evento: evento,
                       context,
+                      isOrganizer: isOrganizer,
                       onActionCompleted: () async {
                         bool canReload = await _reloadEvents();
                         Navigator.pop(context, canReload);
