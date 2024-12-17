@@ -63,7 +63,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Crear Evento'),
+        title: const Text('Crear Evento'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -73,7 +73,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             children: [
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(labelText: 'Título'),
+                decoration: const InputDecoration(labelText: 'Título'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, introduce un título';
@@ -83,7 +83,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
               TextFormField(
                 controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Descripción'),
+                decoration: const InputDecoration(labelText: 'Descripción'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, introduce una descripción';
@@ -93,7 +93,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
               TextFormField(
                 controller: _locationController,
-                decoration: InputDecoration(labelText: 'Ubicación'),
+                decoration: const InputDecoration(labelText: 'Ubicación'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, introduce una ubicación';
@@ -103,7 +103,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
               TextFormField(
                 controller: _priceController,
-                decoration: InputDecoration(labelText: 'Precio'),
+                decoration: const InputDecoration(labelText: 'Precio'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -114,7 +114,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
               TextFormField(
                 controller: _imageUrlController,
-                decoration: InputDecoration(labelText: 'URL de la imagen'),
+                decoration: const InputDecoration(labelText: 'URL de la imagen'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, introduce una URL de imagen';
@@ -123,7 +123,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 },
               ),
               ListTile(
-                title: Text('Fecha de inicio'),
+                title: const Text('Fecha de inicio'),
                 subtitle: Text(_startTime != null ? _startTime.toString() : 'Selecciona una fecha'),
                 onTap: () async {
                   DateTime? picked = await showDatePicker(
@@ -140,7 +140,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 },
               ),
               ListTile(
-                title: Text('Fecha de fin'),
+                title: const Text('Fecha de fin'),
                 subtitle: Text(_endTime != null ? _endTime.toString() : 'Selecciona una fecha'),
                 onTap: () async {
                   DateTime? picked = await showDatePicker(
@@ -160,9 +160,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 future: _categoriesFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   } else if (snapshot.hasError) {
-                    return Text('Error al cargar categorías');
+                    return const Text('Error al cargar categorías');
                   } else if (snapshot.hasData) {
                     List<Category> categories = snapshot.data!;
                     return DropdownButtonFormField<String>(
@@ -178,7 +178,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           _selectedCategory = newValue;
                         });
                       },
-                      decoration: InputDecoration(labelText: 'Categoría'),
+                      decoration: const InputDecoration(labelText: 'Categoría'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, selecciona una categoría';
@@ -187,14 +187,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       },
                     );
                   } else {
-                    return Text('No hay categorías disponibles');
+                    return const Text('No hay categorías disponibles');
                   }
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _createEvent,
-                child: Text('Crear Evento'),
+                child: const Text('Crear Evento'),
               ),
             ],
           ),

@@ -37,7 +37,7 @@ class Evento {
       startTime: DateTime.parse(json['start_time']),
       endTime: json['end_time'] != null ? DateTime.parse(json['end_time']) : null,
       location: json['location'] ?? '',
-      price: json['price'] != null ? json['price'].toDouble() : 0.0, // Añadir este campo
+      price: json['price'] != null ? json['price'].toDouble() : 0.0, 
     );
   }
 

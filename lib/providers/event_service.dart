@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:eventify_flutter/providers/user_service.dart';
 import 'package:http/http.dart' as http;
 import '../models/event.dart';
 import '../models/category.dart';
@@ -116,8 +117,7 @@ class EventServices {
     try {
       final token = await _getToken();
       final response = await http.put(
-        Uri.parse(
-            'https://eventify.allsites.es/public/api/eventUpdate'),
+        Uri.parse('https://eventify.allsites.es/public/api/eventUpdate'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -294,5 +294,100 @@ class EventServices {
       print('Error en fetchRegisteredEvents: $e');
       throw Exception('Error al obtener eventos registrados');
     }
+  }
+
+  Future<List<Evento>> fetchRegisteredUserEvents(String userId) async {
+    try {
+      final token = await _getToken();
+      final response = await http.post(
+        Uri.parse(
+            'https://eventify.allsites.es/public/api/eventsByUser?id=$userId'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+
+        if (jsonResponse['success']) {
+          //print(jsonResponse);
+          List<dynamic> data = jsonResponse['data'];
+
+          return data.map((json) => Evento.fromJson(json)).toList();
+        } else {
+          throw Exception(
+              'Error al obtener eventos registrados: ${jsonResponse['message']}');
+        }
+      } else {
+        throw Exception(
+            'Error en la solicitud. Código: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en fetchRegisteredEvents: $e');
+      throw Exception('Error al obtener eventos registrados');
+    }
+  }
+
+  Future<Map<int, int>> fetchRegisteredCount() async {
+    Map<int, int> data = {};
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('user_id');
+    List<Evento> eventsOrg = fetchEventosByOrganizer(userId!) as List<Evento>;
+    List<int> eventsOrgId = new List.empty();
+    for (var event in eventsOrg) {
+      eventsOrgId.add(event.id);
+    }
+    final userResponse = await UserService.getUsers();
+    final List<dynamic> userData = jsonDecode(userResponse.body);
+    List<String> userIds =
+        userData.map((user) => user['id'].toString()).toList();
+
+    for (var id in userIds) {
+      List<Evento> eventsUser = fetchRegisteredUserEvents(id) as List<Evento>;
+      for (var event in eventsUser) {
+        if (eventsOrgId.contains(event.id)) {
+          if (!data.containsKey(event.id)) {
+            data[event.id] = 1;
+          } else {
+            data[event.id] = (data[event.id]! + 1);
+          }
+        }
+      }
+    }
+    return data;
+  }
+
+  Future<Map<String, int>> fetchRegisteredCountByMonth() async {
+
+    Map<int, int> registeredCounts = fetchRegisteredCount() as Map<int, int>;
+    List<Evento> events = fetchEventos() as List<Evento>;
+
+    Map<String, int> data = {};
+    
+    final now = DateTime.now();
+    final fourMonthsAgo = DateTime(now.year, now.month - 4, now.day);
+
+    for (var event in events) {
+      if (registeredCounts.containsKey(event.id)) {
+        final startTime = event.startTime;
+
+        if (startTime.isAfter(fourMonthsAgo) && startTime.isBefore(now)) {
+          
+          String claveMes =
+              "${startTime.year}-${startTime.month.toString().padLeft(2, '0')}";
+
+          
+          data.update(
+            claveMes,
+            (registers) => registers + registeredCounts[event.id]!,
+            ifAbsent: () => registeredCounts[event.id]!,
+          );
+        }
+      }
+    }
+
+    return data;
   }
 }

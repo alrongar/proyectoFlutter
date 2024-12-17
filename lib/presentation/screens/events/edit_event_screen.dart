@@ -22,6 +22,12 @@ class _EditEventScreenState extends State<EditEventScreen> {
   late Future<List<Category>> _categoriesFuture;
 
   @override
+  void initState() {
+    super.initState();
+    _categoriesFuture = EventServices().fetchCategories();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _evento = ModalRoute.of(context)!.settings.arguments as Evento;
@@ -32,8 +38,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
     _imageUrlController.text = _evento.imageUrl ?? '';
     _startTime = _evento.startTime;
     _endTime = _evento.endTime;
-    _selectedCategory = _evento.category;
-    _categoriesFuture = EventServices().fetchCategories();
+    
   }
 
   Future<void> _editEvent() async {
@@ -45,7 +50,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
         imageUrl: _imageUrlController.text,
         organizerId: _evento.organizerId,
         category: _selectedCategory,
-        categoryid: _evento.categoryid,
+        categoryid: int.tryParse(_selectedCategory ?? '0'),
         startTime: _startTime!,
         endTime: _endTime,
         location: _locationController.text,
@@ -65,9 +70,16 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(_categoriesFuture.then((categories) {
+    for (var category in categories) {
+      print('ID: ${category.id}, Name: ${category.name}');
+    }}).catchError((error) {
+    print('Error al cargar categorías: $error');
+  }));
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editar Evento'),
+        title: const Text('Editar Evento'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -77,7 +89,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
             children: [
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(labelText: 'Título'),
+                decoration: const InputDecoration(labelText: 'Título'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, introduce un título';
@@ -87,7 +99,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
               ),
               TextFormField(
                 controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Descripción'),
+                decoration: const InputDecoration(labelText: 'Descripción'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, introduce una descripción';
@@ -97,7 +109,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
               ),
               TextFormField(
                 controller: _locationController,
-                decoration: InputDecoration(labelText: 'Ubicación'),
+                decoration: const InputDecoration(labelText: 'Ubicación'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, introduce una ubicación';
@@ -107,7 +119,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
               ),
               TextFormField(
                 controller: _priceController,
-                decoration: InputDecoration(labelText: 'Precio'),
+                decoration: const InputDecoration(labelText: 'Precio'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -118,7 +130,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
               ),
               TextFormField(
                 controller: _imageUrlController,
-                decoration: InputDecoration(labelText: 'URL de la imagen'),
+                decoration: const InputDecoration(labelText: 'URL de la imagen'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, introduce una URL de imagen';
@@ -127,7 +139,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 },
               ),
               ListTile(
-                title: Text('Fecha de inicio'),
+                title: const Text('Fecha de inicio'),
                 subtitle: Text(_startTime != null ? _startTime.toString() : 'Selecciona una fecha'),
                 onTap: () async {
                   DateTime? picked = await showDatePicker(
@@ -144,7 +156,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 },
               ),
               ListTile(
-                title: Text('Fecha de fin'),
+                title: const Text('Fecha de fin'),
                 subtitle: Text(_endTime != null ? _endTime.toString() : 'Selecciona una fecha'),
                 onTap: () async {
                   DateTime? picked = await showDatePicker(
@@ -164,16 +176,16 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 future: _categoriesFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   } else if (snapshot.hasError) {
-                    return Text('Error al cargar categorías');
+                    return const Text('Error al cargar categorías');
                   } else if (snapshot.hasData) {
                     List<Category> categories = snapshot.data!;
                     return DropdownButtonFormField<String>(
                       value: _selectedCategory,
                       items: categories.map((Category category) {
                         return DropdownMenuItem<String>(
-                          value: category.name,
+                          value: category.id.toString(),
                           child: Text(category.name),
                         );
                       }).toList(),
@@ -182,7 +194,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                           _selectedCategory = newValue;
                         });
                       },
-                      decoration: InputDecoration(labelText: 'Categoría'),
+                      decoration: const InputDecoration(labelText: 'Categoría'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, selecciona una categoría';
@@ -191,14 +203,14 @@ class _EditEventScreenState extends State<EditEventScreen> {
                       },
                     );
                   } else {
-                    return Text('No hay categorías disponibles');
+                    return const Text('No hay categorías disponibles');
                   }
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _editEvent,
-                child: Text('Guardar Cambios'),
+                child: const Text('Guardar Cambios'),
               ),
             ],
           ),
