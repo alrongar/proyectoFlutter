@@ -28,10 +28,12 @@ class EventServices {
           List<dynamic> jsonList = jsonResponse['data'];
           return jsonList.map((json) => Evento.fromJson(json)).toList();
         } else {
-          throw Exception('No se pudo obtener eventos: ${jsonResponse['message']}');
+          throw Exception(
+              'No se pudo obtener eventos: ${jsonResponse['message']}');
         }
       } else {
-        throw Exception('Error al cargar eventos. Código: ${response.statusCode}');
+        throw Exception(
+            'Error al cargar eventos. Código: ${response.statusCode}');
       }
     } catch (e) {
       print('Error en fetchEventos: $e');
@@ -45,7 +47,8 @@ class EventServices {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id');
       final response = await http.post(
-        Uri.parse('https://eventify.allsites.es/public/api/eventsByOrganizer?id=$userId'),
+        Uri.parse(
+            'https://eventify.allsites.es/public/api/eventsByOrganizer?id=$userId'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -58,10 +61,12 @@ class EventServices {
           List<dynamic> jsonList = jsonResponse['data'];
           return jsonList.map((json) => Evento.fromJson(json)).toList();
         } else {
-          throw Exception('No se pudo obtener eventos: ${jsonResponse['message']}');
+          throw Exception(
+              'No se pudo obtener eventos: ${jsonResponse['message']}');
         }
       } else {
-        throw Exception('Error al cargar eventos. Código: ${response.statusCode}');
+        throw Exception(
+            'Error al cargar eventos. Código: ${response.statusCode}');
       }
     } catch (e) {
       print('Error en fetchEventosByOrganizer: $e');
@@ -98,7 +103,8 @@ class EventServices {
       } else {
         print('Error al crear el evento. Código: ${response.statusCode}');
         print('Respuesta del servidor: ${response.body}');
-        throw Exception('Error al crear el evento. Código: ${response.statusCode}');
+        throw Exception(
+            'Error al crear el evento. Código: ${response.statusCode}');
       }
     } catch (e) {
       print('Error en createEvent: $e');
@@ -110,7 +116,8 @@ class EventServices {
     try {
       final token = await _getToken();
       final response = await http.put(
-        Uri.parse('https://eventify.allsites.es/public/api/events/${evento.id}'),
+        Uri.parse(
+            'https://eventify.allsites.es/public/api/eventUpdate'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -120,7 +127,8 @@ class EventServices {
       );
 
       if (response.statusCode != 200) {
-        throw Exception('Error al actualizar el evento. Código: ${response.statusCode}');
+        throw Exception(
+            'Error al actualizar el evento. Código: ${response.statusCode}');
       }
     } catch (e) {
       print('Error en updateEvent: $e');
@@ -131,17 +139,24 @@ class EventServices {
   Future<void> deleteEvent(String eventId) async {
     try {
       final token = await _getToken();
-      final response = await http.delete(
-        Uri.parse('https://eventify.allsites.es/public/api/events/$eventId'),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
+      final response = await http.post(
+          Uri.parse('https://eventify.allsites.es/public/api/eventDelete'),
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'id': eventId,
+          }));
+
+      print(eventId);
+      print(response.statusCode);
+      print(response.body);
 
       if (response.statusCode != 200) {
-        throw Exception('Error al eliminar el evento. Código: ${response.statusCode}');
+        throw Exception(
+            'Error al eliminar el evento. Código: ${response.statusCode}');
       }
     } catch (e) {
       print('Error en deleteEvent: $e');
@@ -257,20 +272,17 @@ class EventServices {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        
       );
 
-      
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        
+
         if (jsonResponse['success']) {
           //print(jsonResponse);
           List<dynamic> data = jsonResponse['data'];
-          
+
           return data.map((json) => Evento.fromJson(json)).toList();
         } else {
-          
           throw Exception(
               'Error al obtener eventos registrados: ${jsonResponse['message']}');
         }
