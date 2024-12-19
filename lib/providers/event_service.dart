@@ -334,18 +334,18 @@ class EventServices {
     Map<int, int> data = {};
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('user_id');
-    List<Evento> eventsOrg = fetchEventosByOrganizer(userId!) as List<Evento>;
-    List<int> eventsOrgId = new List.empty();
+    List<Evento> eventsOrg = await fetchEventosByOrganizer(userId!);
+    List<int> eventsOrgId = [];
     for (var event in eventsOrg) {
       eventsOrgId.add(event.id);
     }
     final userResponse = await UserService.getUsers();
-    final List<dynamic> userData = jsonDecode(userResponse.body);
-    List<String> userIds =
-        userData.map((user) => user['id'].toString()).toList();
+    final Map<String, dynamic> userJson = jsonDecode(userResponse.body);
+    final List<dynamic> userData = userJson['data'] ?? [];
+    List<String> userIds = userData.map((user) => user['id'].toString()).toList();
 
     for (var id in userIds) {
-      List<Evento> eventsUser = fetchRegisteredUserEvents(id) as List<Evento>;
+      List<Evento> eventsUser = await fetchRegisteredUserEvents(id);
       for (var event in eventsUser) {
         if (eventsOrgId.contains(event.id)) {
           if (!data.containsKey(event.id)) {
@@ -356,13 +356,14 @@ class EventServices {
         }
       }
     }
+    print(data);
     return data;
   }
 
   Future<Map<String, int>> fetchRegisteredCountByMonth() async {
 
-    Map<int, int> registeredCounts = fetchRegisteredCount() as Map<int, int>;
-    List<Evento> events = fetchEventos() as List<Evento>;
+    Map<int, int> registeredCounts = await fetchRegisteredCount();
+    List<Evento> events = await fetchEventos();
 
     Map<String, int> data = {};
     
@@ -387,7 +388,7 @@ class EventServices {
         }
       }
     }
-
+    print(data);
     return data;
   }
 }

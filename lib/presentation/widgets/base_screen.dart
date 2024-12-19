@@ -1,3 +1,4 @@
+import 'package:eventify_flutter/providers/event_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/events/event_screen.dart';
@@ -49,7 +50,7 @@ class _BaseScreenState extends State<BaseScreen> {
 
   List<Widget> get _pages {
     final List<Widget> pages = [];
-
+    EventServices eventServices = new EventServices();
     if (_isUser) {
       pages.addAll([
         const UserHomeScreen(),
@@ -72,7 +73,7 @@ class _BaseScreenState extends State<BaseScreen> {
     if (_isOrganizer) {
     pages.addAll([
       const EventosScreen(),
-      const OrganizerScreen(data: {}),
+      const OrganizerScreen(),
     ]);
   }
 

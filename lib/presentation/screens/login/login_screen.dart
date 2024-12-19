@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:eventify_flutter/presentation/widgets/shared/custom_text_field.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/gradient_background.dart';
+import 'package:eventify_flutter/providers/event_service.dart';
 import 'package:eventify_flutter/providers/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:eventify_flutter/presentation/widgets/shared/custom_button.dart';
@@ -57,6 +58,12 @@ class LoginScreenState extends State<LoginScreen> {
           await prefs.setString('role', role);
           if (email.isNotEmpty) {
             await prefs.setString('email', email);
+          }
+          if (role == 'o') {
+            EventServices eventServices = new EventServices();
+            Map<String, int> registeredData = await eventServices.fetchRegisteredCountByMonth();
+            String stringRegisteredData = jsonEncode(registeredData);
+            await prefs.setString('stringRegisteredData', stringRegisteredData);
           }
 
           if (!mounted) return;
