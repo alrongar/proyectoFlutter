@@ -9,7 +9,8 @@ class Evento {
   final DateTime startTime;
   final DateTime? endTime;
   final String? location;
-  final double price; // Añadir este campo
+  final double price;
+  final int deleted; // Hacer este campo opcional
 
   Evento({
     required this.id,
@@ -22,7 +23,8 @@ class Evento {
     required this.startTime,
     this.endTime,
     this.location,
-    required this.price, // Añadir este campo
+    required this.price,
+    this.deleted = 0, // Valor predeterminado de 0
   });
 
   factory Evento.fromJson(Map<String, dynamic> json) {
@@ -37,7 +39,8 @@ class Evento {
       startTime: DateTime.parse(json['start_time']),
       endTime: json['end_time'] != null ? DateTime.parse(json['end_time']) : null,
       location: json['location'] ?? '',
-      price: json['price'] != null ? json['price'].toDouble() : 0.0, 
+      price: json['price'] != null ? json['price'].toDouble() : 0.0,
+      deleted: json['deleted'] ?? 0, // Valor predeterminado de 0
     );
   }
 
@@ -53,7 +56,8 @@ class Evento {
       'start_time': startTime.toIso8601String(),
       'end_time': endTime?.toIso8601String(),
       'location': location,
-      'price': price, // Añadir este campo
+      'price': price,
+      'deleted': deleted, // Incluir el campo deleted
     };
   }
 }

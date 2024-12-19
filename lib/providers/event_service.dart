@@ -60,7 +60,8 @@ class EventServices {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         if (jsonResponse['success']) {
           List<dynamic> jsonList = jsonResponse['data'];
-          return jsonList.map((json) => Evento.fromJson(json)).toList();
+          print(jsonList);
+          return jsonList.map((json) => Evento.fromJson(json)).where((evento)=>evento.deleted==0).toList();
         } else {
           throw Exception(
               'No se pudo obtener eventos: ${jsonResponse['message']}');
@@ -127,39 +128,39 @@ class EventServices {
       );
 
       if (response.statusCode != 200) {
+        Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        return jsonResponse['success'];
+      } else
         throw Exception(
             'Error al actualizar el evento. Código: ${response.statusCode}');
-      }
     } catch (e) {
       print('Error en updateEvent: $e');
       throw Exception('Error al actualizar el evento');
     }
   }
 
-  Future<void> deleteEvent(String eventId) async {
+  Future<bool> deleteEvent(String eventId) async {
     try {
       final token = await _getToken();
       final response = await http.post(
-          Uri.parse('https://eventify.allsites.es/public/api/eventDelete'),
-          headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
-            'id': eventId,
-          }));
+        Uri.parse('https://eventify.allsites.es/public/api/eventDelete'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'id': eventId}),
+      );
 
-      print(eventId);
-      print(response.statusCode);
-      print(response.body);
-
-      if (response.statusCode != 200) {
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        return jsonResponse['success'];
+      } else {
         throw Exception(
-            'Error al eliminar el evento. Código: ${response.statusCode}');
+            'Error al eliminar el evento, código de error: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error en deleteEvent: $e');
+      print('Error en deleteEvent: $e'); // Para depuración
       throw Exception('Error al eliminar el evento');
     }
   }
@@ -342,7 +343,8 @@ class EventServices {
     final userResponse = await UserService.getUsers();
     final Map<String, dynamic> userJson = jsonDecode(userResponse.body);
     final List<dynamic> userData = userJson['data'] ?? [];
-    List<String> userIds = userData.map((user) => user['id'].toString()).toList();
+    List<String> userIds =
+        userData.map((user) => user['id'].toString()).toList();
 
     for (var id in userIds) {
       List<Evento> eventsUser = await fetchRegisteredUserEvents(id);
@@ -361,12 +363,11 @@ class EventServices {
   }
 
   Future<Map<String, int>> fetchRegisteredCountByMonth() async {
-
     Map<int, int> registeredCounts = await fetchRegisteredCount();
     List<Evento> events = await fetchEventos();
 
     Map<String, int> data = {};
-    
+
     final now = DateTime.now();
     final fourMonthsAgo = DateTime(now.year, now.month - 4, now.day);
 
@@ -375,11 +376,9 @@ class EventServices {
         final startTime = event.startTime;
 
         if (startTime.isAfter(fourMonthsAgo) && startTime.isBefore(now)) {
-          
           String claveMes =
               "${startTime.year}-${startTime.month.toString().padLeft(2, '0')}";
 
-          
           data.update(
             claveMes,
             (registers) => registers + registeredCounts[event.id]!,
