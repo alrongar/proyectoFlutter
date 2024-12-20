@@ -24,6 +24,29 @@ class LoginScreenState extends State<LoginScreen> {
   final GlobalKey<CustomTextFieldState> passwordKey =
       GlobalKey<CustomTextFieldState>();
 
+  bool _isLoading = false;
+
+  Future<void> _handleLogin() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await login();
+
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (error) {
+      // Muestra un mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al iniciar sesión: $error')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   Future<void> login() async {
     final email = emailKey.currentState?.textValue ?? '';
     final password = passwordKey.currentState?.textValue ?? '';
@@ -44,13 +67,13 @@ class LoginScreenState extends State<LoginScreen> {
         );
 
         final data = jsonDecode(response.body);
-        print(data);
+       
         if (response.statusCode == 200) {
           final token = data['data']['token'];
           final userId =
               data['data']['id']; // Suponiendo que el id del usuario está aquí
           final role = data['data']['role'];
-          print(role == 'o');
+          
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('auth_token', token);
           await prefs.setString(
@@ -114,7 +137,7 @@ class LoginScreenState extends State<LoginScreen> {
                   fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 20), // Espaciado ajustado
+              const SizedBox(height: 20), 
               Form(
                 key: formKey,
                 child: Column(
@@ -134,11 +157,27 @@ class LoginScreenState extends State<LoginScreen> {
                       isRequired: true,
                     ),
                     const SizedBox(height: 40),
+                    if (_isLoading)
+                      Container(
+                        color: const Color(0xFF001D3D), 
+                        child: const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 20),
+                              Text(
+                                'Cargando...',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     CustomButton(
                       buttonText: 'Iniciar Sesión',
-                      onPressed: () async {
-                        await login();
-                      },
+                      onPressed: _isLoading ? null : _handleLogin,
                     ),
                     const SizedBox(height: 20),
                     GestureDetector(

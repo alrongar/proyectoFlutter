@@ -60,7 +60,6 @@ class EventServices {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         if (jsonResponse['success']) {
           List<dynamic> jsonList = jsonResponse['data'];
-          print(jsonList);
           return jsonList
               .map((json) => Evento.fromJson(json))
               .where((evento) => evento.deleted == 0)
@@ -332,7 +331,7 @@ class EventServices {
         final jsonResponse = jsonDecode(response.body);
 
         if (jsonResponse['success']) {
-          //print(jsonResponse);
+          
           List<dynamic> data = jsonResponse['data'];
 
           return data.map((json) => Evento.fromJson(json)).toList();
@@ -409,7 +408,6 @@ class EventServices {
         }
       }
     }
-    print('$categoryName : $data');
     return data;
   }
 }

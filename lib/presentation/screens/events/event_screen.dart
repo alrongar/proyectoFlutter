@@ -46,7 +46,7 @@ class _EventosScreenState extends State<EventosScreen> {
       setState(() {
         isOrganizer = true;
         eventos = EventServices().fetchEventosByOrganizer(userId!);
-      print(eventos.toString());
+      
       });
     } else if (role == 'u') {
       setState(() {
