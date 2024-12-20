@@ -60,10 +60,18 @@ class LoginScreenState extends State<LoginScreen> {
             await prefs.setString('email', email);
           }
           if (role == 'o') {
-            EventServices eventServices = new EventServices();
-            Map<String, int> registeredData = await eventServices.fetchRegisteredCountByMonth();
-            String stringRegisteredData = jsonEncode(registeredData);
-            await prefs.setString('stringRegisteredData', stringRegisteredData);
+            EventServices eventServices = EventServices();
+            Map<int, int> registeredCounts =
+                await eventServices.fetchRegisteredCount();
+
+            Map<String, int> stringifiedCounts = {
+              for (var key in registeredCounts.keys)
+                key.toString(): registeredCounts[key]!
+            };
+
+            String stringRegisteredCounts = jsonEncode(stringifiedCounts);
+            await prefs.setString(
+                'stringRegisteredCounts', stringRegisteredCounts);
           }
 
           if (!mounted) return;

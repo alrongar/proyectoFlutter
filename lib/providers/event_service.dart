@@ -288,7 +288,8 @@ class EventServices {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id');
       final response = await http.post(
-        Uri.parse('https://eventify.allsites.es/public/api/eventsByUser?id=$userId'),
+        Uri.parse(
+            'https://eventify.allsites.es/public/api/eventsByUser?id=$userId'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -302,10 +303,12 @@ class EventServices {
           List<dynamic> data = jsonResponse['data'];
           return data.map((json) => Evento.fromJson(json)).toList();
         } else {
-          throw Exception('Error al obtener eventos registrados: ${jsonResponse['message']}');
+          throw Exception(
+              'Error al obtener eventos registrados: ${jsonResponse['message']}');
         }
       } else {
-        throw Exception('Error en la solicitud. Código: ${response.statusCode}');
+        throw Exception(
+            'Error en la solicitud. Código: ${response.statusCode}');
       }
     } catch (e) {
       print('Error en fetchRegisteredEvents: $e');
@@ -374,13 +377,16 @@ class EventServices {
         }
       }
     }
-    print(data);
     return data;
   }
 
-  Future<Map<String, int>> fetchRegisteredCountByMonth() async {
-    Map<int, int> registeredCounts = await fetchRegisteredCount();
+  Future<Map<String, int>> fetchRegisteredCountByMonth(
+      Map<int, int> registeredCounts, String? categoryName) async {
     List<Evento> events = await fetchEventos();
+
+    if (categoryName != null) {
+      events = events.where((event) => event.category == categoryName).toList();
+    }
 
     Map<String, int> data = {};
 
@@ -403,7 +409,7 @@ class EventServices {
         }
       }
     }
-    print(data);
+    print('$categoryName : $data');
     return data;
   }
 }
