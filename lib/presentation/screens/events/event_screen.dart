@@ -37,21 +37,23 @@ class _EventosScreenState extends State<EventosScreen> {
   }
 
   Future<void> _loadUserRole() async {
-    
     final prefs = await SharedPreferences.getInstance();
     String? role = prefs.getString('role');
     String? userId = prefs.getString('user_id'); // Recuperar user_id como String
-    
+
     if (role == 'o') {
       setState(() {
         isOrganizer = true;
         eventos = EventServices().fetchEventosByOrganizer(userId!);
-      
       });
     } else if (role == 'u') {
       setState(() {
         isUser = true;
-        eventos = EventServices().fetchEventos();
+        eventos = EventServices().fetchEventos().then((eventos) {
+          // Ordenar eventos por fecha de inicio (startTime) en orden ascendente
+          eventos.sort((a, b) => a.startTime.compareTo(b.startTime));
+          return eventos;
+        });
       });
     }
   }
@@ -66,7 +68,11 @@ class _EventosScreenState extends State<EventosScreen> {
             eventos = EventServices().fetchEventosByOrganizer(userId!);
           });
         } else {
-          eventos = EventServices().fetchEventos();
+          eventos = EventServices().fetchEventos().then((eventos) {
+            // Ordenar eventos por fecha de inicio (startTime) en orden ascendente
+            eventos.sort((a, b) => a.startTime.compareTo(b.startTime));
+            return eventos;
+          });
         }
         canReload = true;
       });
