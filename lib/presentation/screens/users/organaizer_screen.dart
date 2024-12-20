@@ -14,7 +14,6 @@ class OrganizerScreen extends StatefulWidget {
 }
 
 class _OrganizerScreenState extends State<OrganizerScreen> {
-  late Future<Map<String, int>> _data;
   Map<String, int> dataMap = {};
   String? _selectedCategory;
   Future<List<Category>>? _categories;
@@ -51,7 +50,6 @@ class _OrganizerScreenState extends State<OrganizerScreen> {
     super.initState();
 
     _categories = eventServices.fetchCategories();
-    _data = getRegisteredData(null);
     updateData(null);
   }
 
