@@ -61,7 +61,10 @@ class EventServices {
         if (jsonResponse['success']) {
           List<dynamic> jsonList = jsonResponse['data'];
           print(jsonList);
-          return jsonList.map((json) => Evento.fromJson(json)).where((evento)=>evento.deleted==0).toList();
+          return jsonList
+              .map((json) => Evento.fromJson(json))
+              .where((evento) => evento.deleted == 0)
+              .toList();
         } else {
           throw Exception(
               'No se pudo obtener eventos: ${jsonResponse['message']}');
@@ -114,28 +117,46 @@ class EventServices {
     }
   }
 
-  Future<void> updateEvent(Evento evento) async {
+  Future<bool> updateEvent(Evento event) async {
     try {
       final token = await _getToken();
-      final response = await http.put(
+      final body = {
+        'id': event.id.toString(),
+        'organizer_id': event.organizerId.toString(),
+        'title': event.title,
+        'description': event.description,
+        'category_id': event.categoryid.toString(),
+        'start_time': event.startTime.toIso8601String(),
+        'end_time': event.endTime?.toIso8601String() ?? '',
+        'location': event.location,
+        'latitude': event.latitude.toString(),
+        'longitude': event.longitude.toString(),
+        'max_attendees': event.maxAttendees.toString(),
+        'price': event.price.toString(),
+        'image_url': event.imageUrl ?? '',
+      };
+
+      final response = await http.post(
         Uri.parse('https://eventify.allsites.es/public/api/eventUpdate'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode(evento.toJson()),
+        body: jsonEncode(body),
       );
 
-      if (response.statusCode != 200) {
-        Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-        return jsonResponse['success'];
-      } else
-        throw Exception(
-            'Error al actualizar el evento. Código: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        return jsonResponse['success'] == true;
+      } else {
+        print('Error al actualizar el evento. Código: ${response.statusCode}');
+        print('Cuerpo de la respuesta: ${response.body}');
+        return false;
+      }
     } catch (e) {
       print('Error en updateEvent: $e');
-      throw Exception('Error al actualizar el evento');
+      return false;
     }
   }
 
@@ -267,8 +288,7 @@ class EventServices {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id');
       final response = await http.post(
-        Uri.parse(
-            'https://eventify.allsites.es/public/api/eventsByUser?id=$userId'),
+        Uri.parse('https://eventify.allsites.es/public/api/eventsByUser?id=$userId'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -279,17 +299,13 @@ class EventServices {
         final jsonResponse = jsonDecode(response.body);
 
         if (jsonResponse['success']) {
-          //print(jsonResponse);
           List<dynamic> data = jsonResponse['data'];
-
           return data.map((json) => Evento.fromJson(json)).toList();
         } else {
-          throw Exception(
-              'Error al obtener eventos registrados: ${jsonResponse['message']}');
+          throw Exception('Error al obtener eventos registrados: ${jsonResponse['message']}');
         }
       } else {
-        throw Exception(
-            'Error en la solicitud. Código: ${response.statusCode}');
+        throw Exception('Error en la solicitud. Código: ${response.statusCode}');
       }
     } catch (e) {
       print('Error en fetchRegisteredEvents: $e');

@@ -39,7 +39,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         imageUrl: _imageUrlController.text,
         organizerId: userId, // ID del organizador
         category: _selectedCategory,
-        categoryid: int.tryParse(_selectedCategory ?? '0'),
+        categoryid: int.tryParse(_selectedCategory ?? '0') ?? 0,
         startTime: _startTime!,
         endTime: _endTime,
         location: _locationController.text,
