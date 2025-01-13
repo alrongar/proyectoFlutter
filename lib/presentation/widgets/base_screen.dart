@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../screens/events/event_screen.dart';
+import '../screens/map/map_screen.dart';
 import '../screens/users/admin_user_screen.dart';
 import '../screens/report/report_screen.dart';
 import '../screens/users/organaizer_screen.dart';
@@ -47,49 +48,52 @@ class _BaseScreenState extends State<BaseScreen> {
     _loadUserRoles();
   }
 
+  // Páginas dinámicas según el tipo de usuario
   List<Widget> get _pages {
     final List<Widget> pages = [];
+
+    // Páginas para los usuarios
     if (_isUser) {
       pages.addAll([
         const UserHomeScreen(),
         const EventosScreen(),
+        MapScreen(),
+        const ReportScreen(email: ""),
       ]);
-      final email = ModalRoute.of(context)?.settings.arguments as String?;
-      if (email?.isNotEmpty == true) {
-        pages.add(ReportScreen(email: email!));
-      }
     }
 
-    
-
+    // Páginas para los administradores
     if (_isAdmin) {
       pages.add(const UserListScreen());
     }
 
-    
-
+    // Páginas para los organizadores
     if (_isOrganizer) {
-    pages.addAll([
-      const EventosScreen(),
-      const OrganizerScreen(),
-    ]);
-  }
+      pages.addAll([
+        const EventosScreen(),
+        const OrganizerScreen(),
+      ]);
+    }
 
     return pages;
   }
 
+  // Títulos dinámicos según el tipo de usuario
   List<String> get _titles {
     final titles = [
       'Inicio',
       'Eventos',
     ];
 
-    if (_isAdmin) {
-      titles.add('Administración');
+    if (_isUser) {
+      titles.addAll([
+        'Mapa',
+        'Informe',
+      ]);
     }
 
-    if (_isUser) {
-      titles.add('Informe');
+    if (_isAdmin) {
+      titles.add('Administración');
     }
 
     if (_isOrganizer) {
@@ -99,55 +103,64 @@ class _BaseScreenState extends State<BaseScreen> {
     return titles;
   }
 
+  // Íconos y etiquetas del menú dinámicamente según el tipo de usuario
   List<BottomNavigationBarItem> get _menuItems {
     final items = <BottomNavigationBarItem>[];
 
-  if (_isUser) {
-    items.addAll([
-      const BottomNavigationBarItem(
-        icon: Icon(Icons.home),
-        label: 'Home',
-      ),
-      const BottomNavigationBarItem(
-        icon: Icon(Icons.event),
-        label: 'Eventos',
-      ),
-      const BottomNavigationBarItem(
-        icon: Icon(Icons.report),
-        label: 'Informe',
-      ),
-    ]);
-  }
+    // Menú de navegación para usuarios
+    if (_isUser) {
+      items.addAll([
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.event),
+          label: 'Eventos',
+        ),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.map),
+          label: 'Mapa',
+        ),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.report),
+          label: 'Informe',
+        ),
+      ]);
+    }
 
-  if (_isAdmin) {
+    // Menú de navegación para administradores
+    if (_isAdmin) {
+      items.add(const BottomNavigationBarItem(
+        icon: Icon(Icons.admin_panel_settings),
+        label: 'Admin',
+      ));
+    }
+
+    // Menú de navegación para organizadores
+    if (_isOrganizer) {
+      items.addAll([
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.event),
+          label: 'Eventos',
+        ),
+        const BottomNavigationBarItem(
+          icon: Icon(Icons.people),
+          label: 'Organizador',
+        ),
+      ]);
+    }
+
+    // Botón Logout para todos
     items.add(const BottomNavigationBarItem(
-      icon: Icon(Icons.admin_panel_settings),
-      label: 'Admin',
+      icon: Icon(Icons.logout),
+      label: 'Logout',
     ));
+
+    return items;
   }
 
-  if (_isOrganizer) {
-    items.addAll([
-      const BottomNavigationBarItem(
-        icon: Icon(Icons.event),
-        label: 'Eventos',
-      ),
-      const BottomNavigationBarItem(
-        icon: Icon(Icons.people),
-        label: 'Organizador',
-      ),
-    ]);
-  }
-
-  // Botón Logout para todos
-  items.add(const BottomNavigationBarItem(
-    icon: Icon(Icons.logout),
-    label: 'Logout',
-  ));
-
-  return items;
-  }
-
+  // Cambiar de página cuando se selecciona una opción del menú
   void _onItemTapped(int index) {
     if (index == _menuItems.length - 1) {
       _logout();
@@ -158,6 +171,7 @@ class _BaseScreenState extends State<BaseScreen> {
     }
   }
 
+  // Cerrar sesión
   Future<void> _logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
@@ -174,7 +188,9 @@ class _BaseScreenState extends State<BaseScreen> {
         backgroundColor: const Color(0xFF001D3D),
         title: Center(
           child: Text(
-            _titles[_currentIndex],
+            _titles.isNotEmpty && _currentIndex < _titles.length
+                ? _titles[_currentIndex]
+                : 'Aplicación',
             style: const TextStyle(
               color: Color(0xFFFFC300),
               fontSize: 24.0,
@@ -185,17 +201,19 @@ class _BaseScreenState extends State<BaseScreen> {
         toolbarHeight: 70.0,
       ),
       body: _isAuthenticated
+          ? (_currentIndex < _pages.length
           ? _pages[_currentIndex]
+          : const Center(child: Text("Página no disponible")))
           : const Center(child: CircularProgressIndicator()),
       bottomNavigationBar: _isAuthenticated
           ? BottomNavigationBar(
-              currentIndex: _currentIndex,
-              onTap: _onItemTapped,
-              items: _menuItems,
-              selectedItemColor: const Color(0xFFFFC300),
-              unselectedItemColor: Colors.grey,
-              backgroundColor: const Color(0xFF001D3D),
-            )
+        currentIndex: _currentIndex,
+        onTap: _onItemTapped,
+        items: _menuItems,
+        selectedItemColor: const Color(0xFFFFC300),
+        unselectedItemColor: Colors.grey,
+        backgroundColor: const Color(0xFF001D3D),
+      )
           : null,
     );
   }
@@ -208,8 +226,7 @@ class _BaseScreenState extends State<BaseScreen> {
     } catch (e) {
       print('Error al recargar eventos: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Hubo un problema al recargar los eventos.')),
+        const SnackBar(content: Text('Hubo un problema al recargar los eventos.')),
       );
     }
   }
