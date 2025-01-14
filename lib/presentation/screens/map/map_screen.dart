@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
+import 'dart:convert';
+
+import '../../../models/event.dart';
+import '../../../providers/event_service.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -12,19 +16,15 @@ class _MapScreenState extends State<MapScreen> {
   LocationData? _currentLocation;
   final Location _locationService = Location();
   late final MapController _mapController;
-
-  // Lista de eventos con latitud y longitud
-  final List<Map<String, dynamic>> eventos = [
-    {"nombre": "Evento 1", "latitud": 40.7128, "longitud": -74.0060},
-    {"nombre": "Evento 2", "latitud": 34.0522, "longitud": -118.2437},
-    {"nombre": "Evento 3", "latitud": 51.5074, "longitud": -0.1278},
-  ];
+  late Future<List<Evento>> _eventosFuture;
+  final EventServices _eventServices = EventServices();
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
     _getUserLocation();
+    _eventosFuture = _eventServices.fetchEventos();
   }
 
   Future<void> _getUserLocation() async {
@@ -50,10 +50,12 @@ class _MapScreenState extends State<MapScreen> {
         _currentLocation = location;
       });
 
-      _mapController.move(
-        LatLng(location.latitude!, location.longitude!),
-        13.0,
-      );
+      if (_currentLocation != null) {
+        _mapController.move(
+          LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+          13.0,
+        );
+      }
     } catch (e) {
       print("Error al obtener la ubicación: $e");
     }
@@ -61,69 +63,149 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_currentLocation == null) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
-      body: _currentLocation == null
-          ? Center(child: CircularProgressIndicator())
-          : FlutterMap(
-        mapController: _mapController,
-        options: MapOptions(
-          center: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-          zoom: 13.0,
-          maxZoom: 18.0,
-          minZoom: 5.0,
-        ),
-        children: [
-          TileLayer(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c'],
-          ),
-          MarkerLayer(
-            markers: [
-              // Marcador para la posición actual
-              Marker(
-                point: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-                builder: (ctx) => Icon(
-                  Icons.location_pin,
-                  color: Colors.blue,
-                  size: 40.0,
-                ),
+      body: FutureBuilder<List<Evento>>(
+        future: _eventosFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error al cargar eventos: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No hay eventos disponibles'));
+          } else {
+            List<Evento> eventos = snapshot.data!;
+
+            return FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                center: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+                zoom: 13.0,
+                maxZoom: 18.0,
+                minZoom: 5.0,
               ),
-              // Marcadores dinámicos para los eventos
-              ...eventos.map((evento) {
-                return Marker(
-                  point: LatLng(evento['latitud'], evento['longitud']),
-                  builder: (ctx) => GestureDetector(
-                    onTap: () {
-                      _showEventDetails(context, evento['nombre']);
-                    },
-                    child: Icon(
-                      Icons.event,
-                      color: Colors.red,
-                      size: 40.0,
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  subdomains: ['a', 'b', 'c'],
+                ),
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+                      builder: (ctx) => Icon(
+                        Icons.location_pin,
+                        color: Colors.blue,
+                        size: 40.0,
+                      ),
                     ),
-                  ),
-                );
-              }).toList(),
-            ],
-          ),
-        ],
+                    ...eventos.map((evento) {
+                      return Marker(
+                        point: LatLng(evento.latitude ?? 0.0, evento.longitude ?? 0.0),
+                        builder: (ctx) => GestureDetector(
+                          onTap: () {
+                            _showEventDetails(context, evento);
+                          },
+                          child: Icon(
+                            Icons.event,
+                            color: Colors.red,
+                            size: 40.0,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ],
+            );
+          }
+        },
       ),
     );
   }
 
-  void _showEventDetails(BuildContext context, String nombre) {
-    showDialog(
+  void _showEventDetails(BuildContext context, Evento evento) {
+    showModalBottomSheet(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Detalles del evento'),
-        content: Text('Nombre: $nombre'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Cerrar'),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Título del evento
+                  Text(
+                    evento.title ?? 'Evento sin nombre',
+                    style: TextStyle(
+                      fontSize: 20, // Cambio de headline6 a un tamaño más apropiado
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 16),
+                  // Imagen del evento
+                  if (evento.imageUrl != null)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.network(evento.imageUrl!, fit: BoxFit.cover),
+                    ),
+                  SizedBox(height: 16),
+                  // Botones
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          // Aquí puedes agregar la funcionalidad de "Cómo llegar"
+                        },
+                        child: Text('Cómo llegar'),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                        },
+                        child: Text('Cerrar'),
+                        style: ElevatedButton.styleFrom(
+                          // color del botón
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

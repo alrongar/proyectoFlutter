@@ -3,6 +3,7 @@ import 'package:eventify_flutter/providers/user_service.dart';
 import 'package:http/http.dart' as http;
 import '../models/event.dart';
 import '../models/category.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EventServices {
@@ -22,7 +23,7 @@ class EventServices {
           'Content-Type': 'application/json',
         },
       );
-
+      print('Respuesta de la API: ${response.body}');
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         if (jsonResponse['success']) {
@@ -331,7 +332,7 @@ class EventServices {
         final jsonResponse = jsonDecode(response.body);
 
         if (jsonResponse['success']) {
-          
+
           List<dynamic> data = jsonResponse['data'];
 
           return data.map((json) => Evento.fromJson(json)).toList();

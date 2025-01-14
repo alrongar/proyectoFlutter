@@ -10,7 +10,7 @@ class Evento {
   final DateTime? endTime;
   final String? location;
   final double price;
-  final int deleted; // Hacer este campo opcional
+  final int deleted;
   final double? latitude;
   final double? longitude;
   final String? latitudeString;
