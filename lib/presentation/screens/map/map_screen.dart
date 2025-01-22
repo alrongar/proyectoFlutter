@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import '../../../models/event.dart';
 import '../../../providers/event_service.dart';
@@ -18,6 +19,7 @@ class _MapScreenState extends State<MapScreen> {
   late final MapController _mapController;
   late Future<List<Evento>> _eventosFuture;
   final EventServices _eventServices = EventServices();
+  List<LatLng>? _route;
 
   @override
   void initState() {
@@ -58,6 +60,21 @@ class _MapScreenState extends State<MapScreen> {
       }
     } catch (e) {
       print("Error al obtener la ubicación: $e");
+    }
+  }
+
+  Future<List<LatLng>> getRoute(LatLng start, LatLng end) async {
+    final apiKey = '5b3ce3597851110001cf6248ffb13c362f9640b2913d128099bbf438';
+    final url = 'https://api.openrouteservice.org/v2/directions/foot-walking?api_key=$apiKey&start=${start.longitude},${start.latitude}&end=${end.longitude},${end.latitude}';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final coordinates = data['features'][0]['geometry']['coordinates'];
+      return coordinates.map<LatLng>((coord) => LatLng(coord[1], coord[0])).toList();
+    } else {
+      throw Exception('Error al obtener la ruta: ${response.body}');
     }
   }
 
@@ -122,6 +139,20 @@ class _MapScreenState extends State<MapScreen> {
                     }).toList(),
                   ],
                 ),
+                if (_route != null)
+                  IgnorePointer(
+                    ignoring: true,
+                    child: PolylineLayer(
+                      polylines: [
+                        Polyline(
+                          points: _route!,
+                          strokeWidth: 4.0,
+                          color: Colors.blue,
+                          isDotted: false,
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             );
           }
@@ -153,7 +184,7 @@ class _MapScreenState extends State<MapScreen> {
                   Text(
                     evento.title ?? 'Evento sin nombre',
                     style: TextStyle(
-                      fontSize: 20, // Cambio de headline6 a un tamaño más apropiado
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
@@ -172,9 +203,21 @@ class _MapScreenState extends State<MapScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           Navigator.of(ctx).pop();
-                          // Aquí puedes agregar la funcionalidad de "Cómo llegar"
+                          if (_currentLocation != null) {
+                            try {
+                              final route = await getRoute(
+                                LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+                                LatLng(evento.latitude ?? 0.0, evento.longitude ?? 0.0),
+                              );
+                              setState(() {
+                                _route = route;
+                              });
+                            } catch (e) {
+                              print('Error al obtener la ruta: $e');
+                            }
+                          }
                         },
                         child: Text('Cómo llegar'),
                         style: ElevatedButton.styleFrom(
@@ -191,7 +234,6 @@ class _MapScreenState extends State<MapScreen> {
                         },
                         child: Text('Cerrar'),
                         style: ElevatedButton.styleFrom(
-                          // color del botón
                           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
