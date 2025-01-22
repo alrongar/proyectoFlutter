@@ -13,11 +13,12 @@ class _MapScreenState extends State<MapScreen> {
   final Location _locationService = Location();
   late final MapController _mapController;
 
-  // Lista de eventos con latitud y longitud
+  // Lista de eventos con latitud y longitud 
   final List<Map<String, dynamic>> eventos = [
     {"nombre": "Evento 1", "latitud": 40.7128, "longitud": -74.0060},
     {"nombre": "Evento 2", "latitud": 34.0522, "longitud": -118.2437},
     {"nombre": "Evento 3", "latitud": 51.5074, "longitud": -0.1278},
+    {"nombre": "Evento 4", "latitud": 36.5008333, "longitud": -6.269444444444445},
   ];
 
   @override
@@ -61,9 +62,18 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const Distance distance = Distance();
+
+    final nearbyEvents = eventos.where((evento) {
+    final double eventDistance = distance(
+      LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+      LatLng(evento['latitud'], evento['longitud']),
+    );
+    return eventDistance <= 2000;
+  }).toList();
     return Scaffold(
       body: _currentLocation == null
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : FlutterMap(
         mapController: _mapController,
         options: MapOptions(
@@ -82,21 +92,21 @@ class _MapScreenState extends State<MapScreen> {
               // Marcador para la posición actual
               Marker(
                 point: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-                builder: (ctx) => Icon(
+                builder: (ctx) => const Icon(
                   Icons.location_pin,
                   color: Colors.blue,
                   size: 40.0,
                 ),
               ),
               // Marcadores dinámicos para los eventos
-              ...eventos.map((evento) {
+              ...nearbyEvents.map((evento) {
                 return Marker(
                   point: LatLng(evento['latitud'], evento['longitud']),
                   builder: (ctx) => GestureDetector(
                     onTap: () {
                       _showEventDetails(context, evento['nombre']);
                     },
-                    child: Icon(
+                    child: const Icon(
                       Icons.event,
                       color: Colors.red,
                       size: 40.0,
@@ -115,12 +125,12 @@ class _MapScreenState extends State<MapScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Detalles del evento'),
+        title: const Text('Detalles del evento'),
         content: Text('Nombre: $nombre'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Cerrar'),
+            child: const Text('Cerrar'),
           ),
         ],
       ),
