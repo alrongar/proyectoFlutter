@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "463118843374",
+    "project_id": "pushnotifications-d3726",
+    "storage_bucket": "pushnotifications-d3726.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463118843374:android:5016cd75646cf212fda2ff",
+        "android_client_info": {
+          "package_name": "com.example.eventify_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgXu7HBBlKp7bKKqgs5Tmfa0uRD5-Ngi4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

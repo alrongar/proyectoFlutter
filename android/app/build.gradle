@@ -3,14 +3,19 @@ plugins {
     id "kotlin-android"
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
+    id 'com.google.gms.google-services' version '4.3.15' apply false
 }
 
 android {
+    // com.example.eventify
     namespace = "com.example.eventify_flutter"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+        // Sets Java compatibility to Java 8
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -39,6 +44,18 @@ android {
     }
 }
 
+dependencies {
+    // For AGP 7.4+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+    // For AGP 7.3
+    // coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.3'
+    // For AGP 4.0 to 7.2
+    // coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.9'
+    //classpath 'com.android.tools.build:gradle:7.3.1'
+}
+
 flutter {
     source = "../.."
 }
+
+apply plugin: 'com.google.gms.google-services'

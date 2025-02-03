@@ -1,3 +1,4 @@
+import 'package:eventify_flutter/firebase_options.dart';
 import 'package:eventify_flutter/presentation/screens/events/event_screen.dart';
 import 'package:eventify_flutter/presentation/screens/login/login_screen.dart';
 import 'package:eventify_flutter/presentation/screens/login/register_screen.dart';
@@ -6,12 +7,19 @@ import 'package:eventify_flutter/presentation/screens/events/create_event_screen
 import 'package:eventify_flutter/presentation/screens/events/edit_event_screen.dart';
 import 'package:eventify_flutter/presentation/screens/report/report_screen.dart';
 import 'package:eventify_flutter/presentation/widgets/base_screen.dart';
+import 'package:eventify_flutter/providers/firebase_api.dart';
 import 'package:eventify_flutter/providers/user_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'config/theme/app_theme.dart';
 
-void main() {
+final navigatorkey = GlobalKey<NavigatorState>();
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseApi().initNotifications();
   runApp(
     MultiProvider(
       providers: [
@@ -31,7 +39,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Eventify',
       theme: AppTheme(selectedColor: 1).theme(),
-      initialRoute: '/login', // Comenzamos desde Login
+      initialRoute: '/login',
+      navigatorKey: navigatorkey,
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
