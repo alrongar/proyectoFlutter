@@ -1,4 +1,3 @@
-import 'package:eventify_flutter/firebase_options.dart';
 import 'package:eventify_flutter/presentation/screens/events/event_screen.dart';
 import 'package:eventify_flutter/presentation/screens/login/login_screen.dart';
 import 'package:eventify_flutter/presentation/screens/login/register_screen.dart';
@@ -7,19 +6,34 @@ import 'package:eventify_flutter/presentation/screens/events/create_event_screen
 import 'package:eventify_flutter/presentation/screens/events/edit_event_screen.dart';
 import 'package:eventify_flutter/presentation/screens/report/report_screen.dart';
 import 'package:eventify_flutter/presentation/widgets/base_screen.dart';
-import 'package:eventify_flutter/providers/firebase_api.dart';
 import 'package:eventify_flutter/providers/user_service.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'config/theme/app_theme.dart';
 
-final navigatorkey = GlobalKey<NavigatorState>();
+// Define la clave de navegación global
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-void main() async{
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print('Mensaje en segundo plano: ${message.notification?.title}');
+}
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseApi().initNotifications();
+  await Firebase.initializeApp();
+
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  // Escucha mensajes en primer plano
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Mensaje en primer plano: ${message.notification?.title}');
+  });
+
+  // Escucha mensajes en segundo plano
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   runApp(
     MultiProvider(
       providers: [
@@ -40,7 +54,7 @@ class MyApp extends StatelessWidget {
       title: 'Eventify',
       theme: AppTheme(selectedColor: 1).theme(),
       initialRoute: '/login',
-      navigatorKey: navigatorkey,
+      navigatorKey: navigatorKey, // Usa la clave de navegación global
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
@@ -49,13 +63,14 @@ class MyApp extends StatelessWidget {
           final email = ModalRoute.of(context)?.settings.arguments as String?;
           return BaseScreen(email: email ?? '');
         },
-        '/eventos': (context) => EventosScreen(),
+        '/eventos': (context) => const EventosScreen(),
         '/report': (context) {
           final email = ModalRoute.of(context)?.settings.arguments as String?;
           return ReportScreen(email: email ?? '');
         },
-        '/createEvent': (context) => CreateEventScreen(), // Añade la ruta para crear eventos
-        '/editEvent': (context) => EditEventScreen(), // Añade la ruta para editar eventos
+        '/createEvent': (context) => CreateEventScreen(),
+        '/editEvent': (context) =>EditEventScreen(),
+
       },
     );
   }

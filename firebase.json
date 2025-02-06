@@ -1,1 +1,18 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"pushnotifications-d3726","appId":"1:463118843374:android:5016cd75646cf212fda2ff","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"pushnotifications-d3726","configurations":{"android":"1:463118843374:android:5016cd75646cf212fda2ff"}}}}}}
+{
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+
+      ]
+    }
+  ]
+}

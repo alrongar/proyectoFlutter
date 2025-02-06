@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'package:eventify_flutter/providers/user_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import '../models/event.dart';
 import '../models/category.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Importa SharedPreferences
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -218,37 +222,91 @@ class EventServices {
     }
   }
 
-  // Registrar a un usuario en un evento
-  Future<Map<String, dynamic>> registerEvent(Evento evento) async {
-    try {
-      final token = await _getToken();
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('user_id');
+  static Future<http.Response> registerEvent(Evento evento) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    String? userId = prefs.getString('user_id');
+    DateTime registeredAt = DateTime.now();
 
-      final response = await http.post(
-        Uri.parse('https://eventify.allsites.es/public/api/registerEvent'),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'user_id': userId,
-          'event_id': evento.id,
-          'registered_at': DateTime.now().toIso8601String(),
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception(
-            'Error al registrar evento. Código: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error en registerEvent: $e');
-      throw Exception('Error: $e');
+    // Verifica que el token de autenticación y el ID del usuario no sean nulos
+    if (token == null || userId == null) {
+      print("Error: Token de autenticación o ID de usuario es nulo");
+      return http.Response("Error: Token de autenticación o ID de usuario es nulo", 400);
     }
+
+    // URL de la API para registrar el evento
+    var url = Uri.parse('https://eventify.allsites.es/public/api/registerEvent');
+    var headers = {
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    };
+
+    // Cuerpo de la solicitud HTTP
+    var body = {
+      "user_id": userId,
+      "event_id": evento.id.toString(),
+      "registered_at": DateFormat('yyyy-MM-dd HH:mm:ss').format(registeredAt),
+    };
+
+    // Realiza la solicitud HTTP
+    var response = await http.post(url, headers: headers, body: jsonEncode(body));
+
+    // Guarda el token en Firestore si la solicitud HTTP es exitosa
+    if (response.statusCode == 200) {
+      try {
+        // Obtén el token del dispositivo
+        FirebaseMessaging messaging = FirebaseMessaging.instance;
+        String? deviceToken = await messaging.getToken();
+
+        // Solicita permisos para notificaciones
+        await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          announcement: false,
+          badge: true,
+          carPlay: false,
+          criticalAlert: false,
+          provisional: false,
+          sound: true,
+        );
+
+        if (deviceToken == null) {
+          print("Error: Token del dispositivo es nulo");
+          return response;
+        }
+
+        // Referencia al documento del evento en Firestore
+        final eventRef = FirebaseFirestore.instance
+            .collection('eventos') // Nombre de la colección
+            .doc(evento.id.toString()); // ID del evento
+
+        print('✅ Ruta en Firestore: ${eventRef.path}');
+
+        // Verifica si el evento existe
+        final eventDoc = await eventRef.get();
+
+        if (!eventDoc.exists) {
+          // Crea el evento si no existe
+          await eventRef.set({
+            'eventId': evento.id.toString(),
+            'title': evento.title.toString(),
+            'startTime': Timestamp.fromDate(DateTime.parse(evento.startTime.toString())), // Usa Timestamp
+            'registeredUsers': [deviceToken], // Array de tokens de usuarios registrados
+          });
+          print('✅ Evento creado en Firestore');
+        } else {
+          // Actualiza el array de usuarios registrados
+          await eventRef.update({
+            'registeredUsers': FieldValue.arrayUnion([deviceToken]),
+          });
+          print('✅ Token agregado al evento existente');
+        }
+      } catch (e) {
+        print('🔥 Error en Firestore: $e');
+      }
+    }
+
+    return response;
   }
 
   //quitar a un usuario de un evento

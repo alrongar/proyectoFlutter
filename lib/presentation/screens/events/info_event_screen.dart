@@ -116,7 +116,7 @@ class _EventDetailsState extends State<EventDetails> {
                 } else {
 
                   try {
-                    eventServices.registerEvent(widget.evento);
+                    EventServices.registerEvent(widget.evento);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('¡Te has apuntado al evento!')),
                     );
