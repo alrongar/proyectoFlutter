@@ -78,6 +78,11 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+  double calculateDistance(LatLng start, LatLng end) {
+    final Distance distance = Distance();
+    return distance(start, end);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_currentLocation == null) {
@@ -98,11 +103,21 @@ class _MapScreenState extends State<MapScreen> {
             return Center(child: Text('No hay eventos disponibles'));
           } else {
             List<Evento> eventos = snapshot.data!;
+            LatLng currentLatLng = LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!);
+
+            List<Evento> nearbyEventos = eventos.where((evento) {
+              LatLng eventLatLng = LatLng(evento.latitude ?? 0.0, evento.longitude ?? 0.0);
+              return calculateDistance(currentLatLng, eventLatLng) <= 2000;
+            }).toList();
+
+            if (nearbyEventos.isEmpty) {
+              return Center(child: Text('No hay eventos cerca de su ubicación'));
+            }
 
             return FlutterMap(
               mapController: _mapController,
               options: MapOptions(
-                center: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+                center: currentLatLng,
                 zoom: 13.0,
                 maxZoom: 18.0,
                 minZoom: 5.0,
@@ -115,14 +130,14 @@ class _MapScreenState extends State<MapScreen> {
                 MarkerLayer(
                   markers: [
                     Marker(
-                      point: LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
+                      point: currentLatLng,
                       builder: (ctx) => Icon(
                         Icons.location_pin,
                         color: Colors.blue,
                         size: 40.0,
                       ),
                     ),
-                    ...eventos.map((evento) {
+                    ...nearbyEventos.map((evento) {
                       return Marker(
                         point: LatLng(evento.latitude ?? 0.0, evento.longitude ?? 0.0),
                         builder: (ctx) => GestureDetector(
@@ -180,7 +195,6 @@ class _MapScreenState extends State<MapScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Título del evento
                   Text(
                     evento.title ?? 'Evento sin nombre',
                     style: TextStyle(
@@ -191,14 +205,12 @@ class _MapScreenState extends State<MapScreen> {
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 16),
-                  // Imagen del evento
                   if (evento.imageUrl != null)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
                       child: Image.network(evento.imageUrl!, fit: BoxFit.cover),
                     ),
                   SizedBox(height: 16),
-                  // Botones
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
